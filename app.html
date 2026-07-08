@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="./icon.svg">
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
 <link rel="manifest" href="./manifest.webmanifest">
-<title>CREATEZ – Superadmin Portal</title>
+<title>CREATEZ – Geschäftsführer Cockpit</title>
 <style>
   :root{
     --bg:#111418; --surface:#181d24; --surface2:#1f2731; --line:#2a333f;
@@ -38,22 +38,22 @@
   .brand b{font-size:17px;letter-spacing:.5px}
   .brand small{color:var(--muted);font-size:11px}
   .logo{width:34px;height:34px;border-radius:9px;background:var(--accent);
-    display:grid;place-items:center;font-weight:800;color:#fff;font-size:15px}
+    display:grid;place-items:center;font-weight:800;color:#fff;font-size:15px;flex:none}
   .badge{margin-left:auto;background:linear-gradient(135deg,#f5a623,#f2545b);color:#161616;
-    font-weight:700;font-size:10px;padding:5px 9px;border-radius:999px;letter-spacing:.4px}
+    font-weight:800;font-size:9px;padding:5px 8px;border-radius:999px;letter-spacing:.4px;white-space:nowrap}
 
   /* Views */
-  .view{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 16px 96px}
+  .view{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 16px 170px}
   .hidden{display:none!important}
 
   /* Bottom nav */
   .nav{
     position:sticky;bottom:0;display:flex;background:var(--surface);
-    border-top:1px solid var(--line);padding:6px 6px calc(6px + var(--safe-bottom));z-index:20;
+    border-top:1px solid var(--line);padding:6px 4px calc(6px + var(--safe-bottom));z-index:20;
   }
   .nav button{
-    flex:1;background:none;border:0;color:var(--muted);padding:8px 4px;border-radius:12px;
-    display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;font-weight:600;
+    flex:1;background:none;border:0;color:var(--muted);padding:8px 2px;border-radius:12px;
+    display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;font-weight:600;min-height:52px;
   }
   .nav button.active{color:var(--accent)}
   .nav svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
@@ -63,25 +63,37 @@
   .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px}
   .row{display:flex;align-items:center;gap:12px}
   .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-  .stat{flex:1;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px}
-  .stat .n{font-size:26px;font-weight:800}
-  .stat .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .stat{flex:1;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:12px 10px;text-align:center;min-width:0}
+  .stat .n{font-size:22px;font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .stat .l{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px}
   .muted{color:var(--muted)}
-  .pill{font-size:11px;padding:3px 9px;border-radius:999px;background:var(--surface2);color:var(--muted);font-weight:600}
+  .meta{font-size:12.5px;color:var(--muted)}
 
   /* Buttons */
-  .btn{border:0;border-radius:12px;padding:12px 16px;font-weight:700;color:#fff;background:var(--accent);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+  .btn{border:0;border-radius:12px;padding:13px 16px;font-weight:700;color:#fff;background:var(--accent);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:48px}
   .btn:active{transform:scale(.98)}
   .btn.block{width:100%}
   .btn.ghost{background:var(--surface2);color:var(--text);border:1px solid var(--line)}
-  .btn.sm{padding:8px 12px;font-size:13px;border-radius:10px}
   .btn.danger{background:var(--danger)}
   .btn.ok{background:var(--ok);color:#08130b}
+  .chip{font-size:12px;font-weight:700;padding:8px 12px;border-radius:999px;background:var(--surface2);border:1px solid var(--line);color:var(--text);display:inline-flex;gap:5px;align-items:center;min-height:36px}
+  .chip.share{background:var(--accent);border-color:var(--accent);color:#fff}
+
+  /* Home / Cockpit */
+  .greet h1{font-size:22px;margin:2px 0 0;font-weight:800}
+  .greet .meta{font-size:13px}
+  .next-ev{background:linear-gradient(135deg,#1b3a6b,#16233a);border:1px solid #2f80ff55;border-radius:16px;padding:16px;margin:14px 0 12px}
+  .next-ev .l{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:#9db9e8;font-weight:800}
+  .next-ev .t{font-size:17px;font-weight:800;margin-top:4px}
+  .qa{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .qa button{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 8px;color:var(--text);font-weight:700;font-size:13px;display:flex;flex-direction:column;gap:6px;align-items:center;min-height:76px}
+  .qa button:active{transform:scale(.97);background:var(--surface2)}
+  .qa .ico{font-size:22px}
 
   /* Calendar */
   .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
   .cal-head b{font-size:18px}
-  .nav-arrow{width:40px;height:40px;border-radius:12px;background:var(--surface2);border:1px solid var(--line);color:var(--text);font-size:20px;display:grid;place-items:center}
+  .nav-arrow{width:44px;height:44px;border-radius:12px;background:var(--surface2);border:1px solid var(--line);color:var(--text);font-size:20px;display:grid;place-items:center}
   .weekdays,.days{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
   .weekdays div{text-align:center;color:var(--muted);font-size:11px;font-weight:700;padding:4px 0}
   .day{aspect-ratio:1;border-radius:12px;background:var(--surface);border:1px solid var(--line);
@@ -98,15 +110,26 @@
   .event .bar{width:5px;border-radius:6px;background:var(--accent);flex:none}
   .event .body{flex:1;min-width:0}
   .event .t{font-weight:700}
-  .event .meta{font-size:12.5px;color:var(--muted);margin-top:2px}
   .event .acts{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
-  .chip{font-size:11px;font-weight:700;padding:6px 10px;border-radius:999px;background:var(--surface2);border:1px solid var(--line);color:var(--text);display:inline-flex;gap:5px;align-items:center}
-  .chip.share{background:var(--accent);border-color:var(--accent);color:#fff}
-  .empty{text-align:center;color:var(--muted);padding:30px 10px;font-size:14px}
+  .empty{text-align:center;color:var(--muted);padding:26px 10px;font-size:14px}
+
+  /* Tasks & Finance rows */
+  .task{display:flex;align-items:center;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:8px}
+  .cb{width:30px;height:30px;border-radius:10px;border:2px solid var(--muted);background:none;color:transparent;font-size:16px;font-weight:900;flex:none;display:grid;place-items:center}
+  .task.done .cb{background:var(--ok);border-color:var(--ok);color:#08130b}
+  .task.done .tt .t{text-decoration:line-through;color:var(--muted)}
+  .tt{flex:1;min-width:0}
+  .tt .t{font-weight:700}
+  .amount{font-weight:800;white-space:nowrap}
+  .amount.plus{color:var(--ok)}
+  .amount.minus{color:var(--danger)}
+  .amount.open{color:var(--warn)}
+  .fin-sum{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 
   /* FAB */
-  .fab{position:absolute;right:18px;bottom:calc(78px + var(--safe-bottom));width:58px;height:58px;border-radius:50%;
+  .fab{position:absolute;right:18px;bottom:calc(84px + var(--safe-bottom));width:60px;height:60px;border-radius:50%;
     background:var(--accent);color:#fff;border:0;font-size:30px;box-shadow:0 8px 24px rgba(47,128,255,.45);z-index:15}
+  .fab.left{right:auto;left:18px}
 
   /* Modal / sheet */
   .sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:40;display:none;align-items:flex-end;justify-content:center}
@@ -115,12 +138,16 @@
   @keyframes up{from{transform:translateY(30px);opacity:.5}to{transform:none;opacity:1}}
   .grab{width:42px;height:5px;border-radius:3px;background:var(--line);margin:8px auto 14px}
   label.f{display:block;font-size:12px;color:var(--muted);font-weight:700;margin:12px 2px 6px;text-transform:uppercase;letter-spacing:.4px}
-  .input,select.input,textarea.input{width:100%;background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:12px;color:var(--text)}
-  textarea.input{min-height:70px;resize:vertical}
+  .input,select.input,textarea.input{width:100%;background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:13px;color:var(--text)}
+  textarea.input{min-height:80px;resize:vertical}
   .colors{display:flex;gap:10px;margin-top:6px}
-  .colors button{width:34px;height:34px;border-radius:50%;border:3px solid transparent}
+  .colors button{width:36px;height:36px;border-radius:50%;border:3px solid transparent}
   .colors button.on{border-color:#fff}
   .sheet-title{font-size:18px;font-weight:800;margin:2px 2px 4px}
+
+  /* Notes */
+  .note-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px}
+  .note-card .txt{white-space:pre-wrap;word-break:break-word;font-size:14.5px}
 
   /* Login */
   .login{position:fixed;inset:0;background:var(--bg);z-index:60;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center}
@@ -131,9 +158,9 @@
   .keys{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:min(320px,80vw)}
   .keys button{aspect-ratio:1.6;border-radius:16px;background:var(--surface);border:1px solid var(--line);color:var(--text);font-size:22px;font-weight:700}
   .keys button.fn{font-size:14px;color:var(--muted)}
-  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(90px + var(--safe-bottom));background:#000;color:#fff;padding:11px 16px;border-radius:12px;font-size:13px;font-weight:600;z-index:80;opacity:0;transition:.25s;pointer-events:none;max-width:88vw;text-align:center}
+  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(96px + var(--safe-bottom));background:#000;color:#fff;padding:11px 16px;border-radius:12px;font-size:13px;font-weight:600;z-index:80;opacity:0;transition:.25s;pointer-events:none;max-width:88vw;text-align:center}
   .toast.show{opacity:1}
-  .install-hint{background:var(--surface2);border:1px dashed var(--accent);border-radius:14px;padding:12px;font-size:13px;color:var(--muted);margin-bottom:12px}
+  .install-hint{background:var(--surface2);border:1px dashed var(--accent);border-radius:14px;padding:12px;font-size:13px;color:var(--muted);margin-bottom:14px}
   a{color:var(--accent)}
 </style>
 </head>
@@ -142,24 +169,57 @@
 <!-- LOGIN -->
 <div class="login" id="login">
   <div class="logo">CZ</div>
-  <div style="font-size:20px;font-weight:800">CREATEZ Portal</div>
-  <div class="muted" style="font-size:13px" id="loginSub">Superadmin-Zugang · PIN eingeben</div>
+  <div style="font-size:20px;font-weight:800">CREATEZ Cockpit</div>
+  <div class="muted" style="font-size:13px" id="loginSub">Geschäftsführer-Zugang · PIN eingeben</div>
   <div class="pin" id="pinDots"></div>
   <div class="keys" id="keys"></div>
-  <div class="muted" id="pinHint" style="font-size:12px;margin-top:18px">Erst-PIN: <b>1234</b> · danach im Admin änderbar</div>
+  <div class="muted" id="pinHint" style="font-size:12px;margin-top:18px">Erst-PIN: <b>1234</b> · danach unter „Mehr" änderbar</div>
 </div>
 
 <!-- APP -->
 <div class="app hidden" id="app">
   <div class="topbar">
     <div class="logo">CZ</div>
-    <div class="brand"><b>CREATEZ</b><small>Transportkoordination</small></div>
-    <span class="badge">SUPERADMIN</span>
+    <div class="brand"><b>CREATEZ</b><small>GmbH · Geschäftsführer-Cockpit</small></div>
+    <span class="badge">GESCHÄFTSFÜHRER</span>
+  </div>
+
+  <!-- HEUTE / COCKPIT -->
+  <div class="view" id="view-home">
+    <div class="install-hint hidden" id="installHint"></div>
+    <div class="greet row" style="justify-content:space-between;align-items:flex-start">
+      <div>
+        <h1 id="greetTitle">Guten Tag!</h1>
+        <div class="meta" id="greetDate"></div>
+      </div>
+      <button class="chip share" id="shareBriefing">📤 Briefing</button>
+    </div>
+
+    <div class="next-ev" id="nextEvCard"></div>
+
+    <div class="row" style="gap:10px">
+      <div class="stat"><div class="n" id="stToday">0</div><div class="l">Einsätze heute</div></div>
+      <div class="stat"><div class="n" id="stTasks">0</div><div class="l">Offene Aufgaben</div></div>
+      <div class="stat"><div class="n" id="stOffen" style="color:var(--warn)">0 €</div><div class="l">Rechnungen offen</div></div>
+    </div>
+
+    <h2 class="section">Schnellaktionen</h2>
+    <div class="qa">
+      <button id="qaEvent"><span class="ico">📦</span>Neuer Einsatz</button>
+      <button id="qaTask"><span class="ico">✅</span>Neue Aufgabe</button>
+      <button id="qaFin"><span class="ico">💶</span>Neue Buchung</button>
+      <button id="qaNote"><span class="ico">📝</span>Neue Notiz</button>
+    </div>
+
+    <h2 class="section">Heute</h2>
+    <div id="homeToday"></div>
+
+    <h2 class="section">Nächste Aufgaben</h2>
+    <div id="homeTasks"></div>
   </div>
 
   <!-- KALENDER -->
-  <div class="view" id="view-cal">
-    <div class="install-hint hidden" id="installHint"></div>
+  <div class="view hidden" id="view-cal">
     <div class="cal-head">
       <button class="nav-arrow" id="prevM">‹</button>
       <b id="monthLabel"></b>
@@ -170,45 +230,68 @@
 
     <div class="row" style="margin:18px 2px 8px;justify-content:space-between">
       <b id="dayLabel" style="font-size:16px"></b>
-      <button class="chip share" id="shareDay">📤 Tag teilen</button>
+      <div class="row" style="gap:6px">
+        <button class="chip" id="goToday">Heute</button>
+        <button class="chip share" id="shareDay">📤 Teilen</button>
+      </div>
     </div>
     <div id="dayEvents"></div>
   </div>
 
-  <!-- AUFTRÄGE (alle Termine) -->
-  <div class="view hidden" id="view-jobs">
-    <h2 class="section">Alle Einsätze</h2>
+  <!-- AUFGABEN -->
+  <div class="view hidden" id="view-tasks">
+    <h2 class="section">Aufgaben</h2>
     <div class="row" style="gap:8px;margin-bottom:12px">
-      <button class="chip" data-filter="all">Alle</button>
-      <button class="chip" data-filter="upcoming">Kommend</button>
-      <button class="chip" data-filter="past">Vergangen</button>
+      <button class="chip share" data-tfilter="open">Offen</button>
+      <button class="chip" data-tfilter="all">Alle</button>
+      <button class="chip" data-tfilter="done">Erledigt</button>
     </div>
-    <div id="jobsList"></div>
+    <div id="tasksList"></div>
   </div>
 
-  <!-- PARTNER -->
-  <div class="view hidden" id="view-partners">
+  <!-- FINANZEN -->
+  <div class="view hidden" id="view-fin">
+    <h2 class="section" id="finMonthLabel">Finanzen</h2>
+    <div class="fin-sum">
+      <div class="stat"><div class="n amount plus" id="fsIn">0 €</div><div class="l">Einnahmen (Monat)</div></div>
+      <div class="stat"><div class="n amount minus" id="fsOut">0 €</div><div class="l">Ausgaben (Monat)</div></div>
+      <div class="stat"><div class="n" id="fsSaldo">0 €</div><div class="l">Saldo (Monat)</div></div>
+      <div class="stat"><div class="n amount open" id="fsOpen">0 €</div><div class="l">Rechnungen offen</div></div>
+    </div>
+    <div class="row" style="gap:8px;margin:14px 0 12px;flex-wrap:wrap">
+      <button class="chip share" data-ffilter="alle">Alle</button>
+      <button class="chip" data-ffilter="einnahme">Einnahmen</button>
+      <button class="chip" data-ffilter="ausgabe">Ausgaben</button>
+      <button class="chip" data-ffilter="rechnung">Rechnungen</button>
+    </div>
+    <div id="finList"></div>
+    <button class="btn ghost block" id="exportCsv" style="margin-top:8px">📊 Als CSV exportieren (Excel)</button>
+  </div>
+
+  <!-- MEHR -->
+  <div class="view hidden" id="view-more">
+    <h2 class="section">Notizen</h2>
+    <div id="notesList"></div>
+    <button class="btn ghost block" id="addNote">+ Notiz hinzufügen</button>
+
     <h2 class="section">Einsatzpartner</h2>
     <div id="partnersList"></div>
     <button class="btn ghost block" id="addPartner" style="margin-top:8px">+ Partner hinzufügen</button>
-  </div>
-
-  <!-- ADMIN -->
-  <div class="view hidden" id="view-admin">
-    <h2 class="section">Übersicht</h2>
-    <div class="row" style="gap:12px">
-      <div class="stat"><div class="n" id="stEvents">0</div><div class="l">Einsätze</div></div>
-      <div class="stat"><div class="n" id="stUpcoming">0</div><div class="l">Kommend</div></div>
-      <div class="stat"><div class="n" id="stPartners">0</div><div class="l">Partner</div></div>
-    </div>
 
     <h2 class="section">Kalender teilen</h2>
     <div class="card">
-      <div class="muted" style="font-size:13px;margin-bottom:12px">Kalender exportieren/importieren – kompatibel mit Google Kalender, Apple Kalender & Outlook.</div>
+      <div class="muted" style="font-size:13px;margin-bottom:12px">Kompatibel mit Google Kalender, Apple Kalender &amp; Outlook.</div>
       <button class="btn block" id="exportIcs">📅 Ganzen Kalender als .ics exportieren</button>
       <button class="btn ghost block" id="shareAll" style="margin-top:10px">📤 Kalender teilen (Handy-Menü)</button>
       <button class="btn ghost block" id="importIcs" style="margin-top:10px">📥 .ics importieren</button>
       <input type="file" id="icsFile" accept=".ics,text/calendar" class="hidden">
+    </div>
+
+    <h2 class="section">Einstellungen</h2>
+    <div class="card">
+      <label class="f" style="margin-top:0">Dein Name (Begrüßung)</label>
+      <input class="input" id="meName" placeholder="Rui">
+      <button class="btn ghost block" id="fabSide" style="margin-top:12px">🖐 Plus-Button: Seite wechseln (Einhand-Modus)</button>
     </div>
 
     <h2 class="section">Daten</h2>
@@ -223,22 +306,39 @@
       <button class="btn ghost block" id="changePin">🔒 PIN ändern</button>
       <button class="btn danger block" id="logout" style="margin-top:10px">Abmelden</button>
     </div>
-    <div class="muted" style="font-size:11px;text-align:center;margin-top:20px">CREATEZ Superadmin Portal · lokal auf diesem Gerät gespeichert</div>
+    <div class="muted" style="font-size:11px;text-align:center;margin-top:20px">CREATEZ GmbH · Geschäftsführer-Cockpit · Daten lokal auf diesem Gerät</div>
   </div>
 
   <!-- NAV -->
   <div class="nav" id="nav">
-    <button data-view="cal" class="active">
+    <button data-view="home" class="active">
+      <svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8M5 10v10h5v-6h4v6h5V10"/></svg>Heute</button>
+    <button data-view="cal">
       <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Kalender</button>
-    <button data-view="jobs">
-      <svg viewBox="0 0 24 24"><path d="M3 7h18M3 12h18M3 17h18"/></svg>Einsätze</button>
-    <button data-view="partners">
-      <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M4 20c0-3 2.5-5 5-5s5 2 5 5M16 11a3 3 0 100-6M20 20c0-2.5-1.5-4.5-4-4.8"/></svg>Partner</button>
-    <button data-view="admin">
-      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.6 1.6 0 00-1.8-.3 1.6 1.6 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.6 1.6 0 00-1-1.5 1.6 1.6 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.6 1.6 0 00.3-1.8 1.6 1.6 0 00-1.5-1H3a2 2 0 110-4h.1a1.6 1.6 0 001.5-1 1.6 1.6 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.6 1.6 0 001.8.3H9a1.6 1.6 0 001-1.5V3a2 2 0 114 0v.1a1.6 1.6 0 001 1.5 1.6 1.6 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.6 1.6 0 00-.3 1.8V9a1.6 1.6 0 001.5 1H21a2 2 0 110 4h-.1a1.6 1.6 0 00-1.5 1z"/></svg>Admin</button>
+    <button data-view="tasks">
+      <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M8 12l3 3 5-6"/></svg>Aufgaben</button>
+    <button data-view="fin">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15 8.5a4 4 0 100 7M7.5 10.5h5M7.5 13.5h5"/></svg>Finanzen</button>
+    <button data-view="more">
+      <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>Mehr</button>
   </div>
 
   <button class="fab" id="fab">＋</button>
+</div>
+
+<!-- QUICK-ADD SHEET -->
+<div class="sheet-bg" id="quickSheet">
+  <div class="sheet">
+    <div class="grab"></div>
+    <div class="sheet-title">Schnell hinzufügen</div>
+    <div class="qa" style="margin-top:10px">
+      <button id="qEvent"><span class="ico">📦</span>Einsatz</button>
+      <button id="qTask"><span class="ico">✅</span>Aufgabe</button>
+      <button id="qFin"><span class="ico">💶</span>Buchung</button>
+      <button id="qNote"><span class="ico">📝</span>Notiz</button>
+    </div>
+    <button class="btn ghost block" id="qClose" style="margin-top:14px">Schließen</button>
+  </div>
 </div>
 
 <!-- EVENT SHEET -->
@@ -269,11 +369,67 @@
     <textarea class="input" id="fNote" placeholder="Details, Kontakt, Ladung …"></textarea>
     <label class="f">Farbe</label>
     <div class="colors" id="colors"></div>
-    <div class="row" style="gap:10px;margin-top:20px">
-      <button class="btn ok block" id="saveEvent">Speichern</button>
-    </div>
+    <button class="btn ok block" id="saveEvent" style="margin-top:20px">Speichern</button>
     <button class="btn danger block hidden" id="deleteEvent" style="margin-top:10px">Löschen</button>
     <button class="btn ghost block" id="closeSheet" style="margin-top:10px">Abbrechen</button>
+  </div>
+</div>
+
+<!-- TASK SHEET -->
+<div class="sheet-bg" id="taskSheet">
+  <div class="sheet">
+    <div class="grab"></div>
+    <div class="sheet-title" id="tSheetTitle">Neue Aufgabe</div>
+    <label class="f">Aufgabe</label>
+    <input class="input" id="tTitle" placeholder="z.B. Angebot an Kunde senden">
+    <div class="grid2">
+      <div><label class="f">Fällig am</label><input class="input" type="date" id="tDue"></div>
+      <div><label class="f">Priorität</label>
+        <select class="input" id="tPrio"><option value="hoch">🔴 Hoch</option><option value="mittel" selected>🟡 Mittel</option><option value="niedrig">🟢 Niedrig</option></select>
+      </div>
+    </div>
+    <button class="btn ok block" id="tSave" style="margin-top:20px">Speichern</button>
+    <button class="btn danger block hidden" id="tDelete" style="margin-top:10px">Löschen</button>
+    <button class="btn ghost block" id="tClose" style="margin-top:10px">Abbrechen</button>
+  </div>
+</div>
+
+<!-- FINANCE SHEET -->
+<div class="sheet-bg" id="finSheet">
+  <div class="sheet">
+    <div class="grab"></div>
+    <div class="sheet-title" id="fiSheetTitle">Neue Buchung</div>
+    <label class="f">Typ</label>
+    <select class="input" id="fiType">
+      <option value="einnahme">💰 Einnahme</option>
+      <option value="ausgabe">💸 Ausgabe</option>
+      <option value="rechnung">🧾 Rechnung (an Kunde)</option>
+    </select>
+    <label class="f">Bezeichnung</label>
+    <input class="input" id="fiLabel" placeholder="z.B. Transport Meier GmbH">
+    <div class="grid2">
+      <div><label class="f">Betrag (€)</label><input class="input" id="fiAmount" inputmode="decimal" placeholder="z.B. 250,00"></div>
+      <div><label class="f">Datum</label><input class="input" type="date" id="fiDate"></div>
+    </div>
+    <div id="fiStatusWrap">
+      <label class="f">Status</label>
+      <select class="input" id="fiStatus"><option value="offen">🟠 Offen</option><option value="bezahlt">✅ Bezahlt</option></select>
+    </div>
+    <button class="btn ok block" id="fiSave" style="margin-top:20px">Speichern</button>
+    <button class="btn danger block hidden" id="fiDelete" style="margin-top:10px">Löschen</button>
+    <button class="btn ghost block" id="fiClose" style="margin-top:10px">Abbrechen</button>
+  </div>
+</div>
+
+<!-- NOTE SHEET -->
+<div class="sheet-bg" id="noteSheet">
+  <div class="sheet">
+    <div class="grab"></div>
+    <div class="sheet-title">Notiz</div>
+    <label class="f">Text</label>
+    <textarea class="input" id="nText" placeholder="Kurz festhalten …" style="min-height:120px"></textarea>
+    <button class="btn ok block" id="nSave" style="margin-top:18px">Speichern</button>
+    <button class="btn ghost block" id="nClose" style="margin-top:10px">Abbrechen</button>
   </div>
 </div>
 
@@ -317,21 +473,31 @@ const DB = {
 };
 let events   = DB.get('events', []);
 let partners = DB.get('partners', [{id:uid(),name:'Kahrout Transporte',phone:'',note:'Flexibler Einsatzpartner'}]);
+let tasks    = DB.get('tasks', []);
+let fin      = DB.get('fin', []);
+let notes    = DB.get('notes', []);
 const COLORS = ['#2f80ff','#2ec16b','#f5a623','#f2545b','#a06bff','#18b6c9'];
+const PRIOC  = {hoch:'#f2545b',mittel:'#f5a623',niedrig:'#2ec16b'};
+const PRIOW  = {hoch:0,mittel:1,niedrig:2};
+const TYPEL  = {einnahme:'Einnahme',ausgabe:'Ausgabe',rechnung:'Rechnung'};
 
 function uid(){ return 'x'+Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-3) }
-function save(){ DB.set('events',events); DB.set('partners',partners) }
+function save(){ DB.set('events',events); DB.set('partners',partners); DB.set('tasks',tasks); DB.set('fin',fin); DB.set('notes',notes) }
 function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2200) }
 const pad=n=>String(n).padStart(2,'0');
 const iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+function esc(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])) }
+function eur(n){ return (Number(n)||0).toLocaleString('de-DE',{style:'currency',currency:'EUR'}) }
+function eurShort(n){ return Math.round(Number(n)||0).toLocaleString('de-DE')+' €' }
+function parseAmount(v){ v=String(v).trim(); if(!v) return NaN; if(v.includes(',')) v=v.replace(/\./g,'').replace(',','.'); return parseFloat(v) }
+function fmtShort(ds){ const p=ds.split('-'); return parseInt(p[2],10)+'.'+parseInt(p[1],10)+'.' }
 
 /* ---------- Auth (PIN) ---------- */
 async function hash(s){
   const buf=await crypto.subtle.digest('SHA-256', new TextEncoder().encode('cz$'+s));
   return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
 }
-let pinBuffer='', pinMode='login'; // login | set1 | set2
-let tmpPin='';
+let pinBuffer='', pinMode='login', tmpPin='';
 
 function renderKeys(){
   const keys=document.getElementById('keys');
@@ -368,7 +534,7 @@ async function handlePin(){
     renderDots();
   } else if(pinMode==='set2'){
     if(entered===tmpPin){ DB.set('pinHash', await hash(entered)); toast('PIN geändert'); pinMode='login'; enterApp(); }
-    else { toast('PIN stimmt nicht überein'); pinMode='set1'; document.getElementById('loginSub').textContent='Superadmin-Zugang · Neue PIN'; renderDots(); }
+    else { toast('PIN stimmt nicht überein'); pinMode='set1'; document.getElementById('loginSub').textContent='Geschäftsführer-Zugang · Neue PIN'; renderDots(); }
   }
 }
 function enterApp(){
@@ -379,35 +545,144 @@ function enterApp(){
 function lock(){
   document.getElementById('app').classList.add('hidden');
   document.getElementById('login').classList.remove('hidden');
-  pinMode='login'; pinBuffer=''; document.getElementById('loginSub').textContent='Superadmin-Zugang · PIN eingeben';
+  pinMode='login'; pinBuffer='';
+  document.getElementById('loginSub').textContent='Geschäftsführer-Zugang · PIN eingeben';
   document.getElementById('pinHint').classList.toggle('hidden', !!DB.get('pinHash',null));
   renderDots();
 }
 
 /* ---------- Navigation ---------- */
+let activeView='home';
 document.getElementById('nav').addEventListener('click',e=>{
   const b=e.target.closest('button'); if(!b) return;
+  activeView=b.dataset.view;
   document.querySelectorAll('#nav button').forEach(x=>x.classList.toggle('active',x===b));
   document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'));
-  document.getElementById('view-'+b.dataset.view).classList.remove('hidden');
-  document.getElementById('fab').style.display = (b.dataset.view==='cal'||b.dataset.view==='jobs')?'block':'none';
-  if(b.dataset.view==='admin') renderStats();
-  if(b.dataset.view==='jobs') renderJobs();
-  if(b.dataset.view==='partners') renderPartners();
+  document.getElementById('view-'+activeView).classList.remove('hidden');
+  document.getElementById('fab').style.display = activeView==='more' ? 'none' : 'block';
+  if(activeView==='home') renderHome();
+  if(activeView==='tasks') renderTasks();
+  if(activeView==='fin') renderFin();
+  if(activeView==='more'){ renderPartners(); renderNotes(); }
 });
+
+/* ---------- Home / Cockpit ---------- */
+const MONTHS=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+const WD=['So','Mo','Di','Mi','Do','Fr','Sa'];
+const WDLONG=['Sonntag','Montag','Dienstag','Mittwoch','Donnerstag','Freitag','Samstag'];
+
+function nextEvent(){
+  const now=new Date();
+  const nowDs=iso(now), nowTm=pad(now.getHours())+':'+pad(now.getMinutes());
+  return events
+    .filter(e=> e.date>nowDs || (e.date===nowDs && (e.start||'23:59')>=nowTm))
+    .sort((a,b)=>(a.date+(a.start||'')).localeCompare(b.date+(b.start||'')))[0] || null;
+}
+function relLabel(ev){
+  const today=iso(new Date());
+  const dLabel = ev.date===today ? 'Heute' : fmtDate(ev.date);
+  const t = ev.start ? ' · '+ev.start+(ev.end?'–'+ev.end:'')+' Uhr' : '';
+  let rel='';
+  if(ev.start||ev.date>today){
+    const target=new Date(ev.date+'T'+(ev.start||'00:00'));
+    const diff=target-new Date();
+    if(diff>0){
+      const m=Math.round(diff/60000);
+      rel=' · in '+(m<60 ? m+' Min' : m<2880 ? Math.floor(m/60)+' Std '+(m%60)+' Min' : Math.round(m/1440)+' Tagen');
+    }
+  }
+  return dLabel+t+rel;
+}
+function renderHome(){
+  const now=new Date();
+  const h=now.getHours();
+  const name=DB.get('name','Rui');
+  document.getElementById('greetTitle').textContent=(h<11?'Guten Morgen':h<18?'Guten Tag':'Guten Abend')+', '+name+'!';
+  document.getElementById('greetDate').textContent=WDLONG[now.getDay()]+', '+now.getDate()+'. '+MONTHS[now.getMonth()]+' '+now.getFullYear();
+
+  const ne=nextEvent(), nc=document.getElementById('nextEvCard');
+  if(ne){
+    nc.innerHTML=`<div class="l">Nächster Einsatz</div><div class="t">${esc(ne.title)}</div>
+      <div class="meta" style="color:#c8d8f2">${esc(relLabel(ne))}</div>
+      ${ne.loc?`<div class="meta" style="color:#9db9e8">📍 ${esc(ne.loc)}</div>`:''}
+      <div style="margin-top:10px"><button class="chip share" id="neShare">📤 Teilen</button></div>`;
+    nc.querySelector('#neShare').onclick=()=>openShare(ne);
+  } else {
+    nc.innerHTML='<div class="l">Nächster Einsatz</div><div class="t" style="color:#9db9e8;font-weight:600">Keine anstehenden Einsätze 🎉</div>';
+  }
+
+  const today=iso(now);
+  document.getElementById('stToday').textContent=eventsOn(today).length;
+  document.getElementById('stTasks').textContent=tasks.filter(t=>!t.done).length;
+  const openSum=fin.filter(f=>f.type==='rechnung'&&!f.paid).reduce((s,f)=>s+f.amount,0);
+  document.getElementById('stOffen').textContent=eurShort(openSum);
+
+  const ht=document.getElementById('homeToday'); ht.innerHTML='';
+  const evs=eventsOn(today);
+  if(!evs.length) ht.innerHTML='<div class="empty">Heute keine Einsätze.</div>';
+  else evs.forEach(ev=>ht.appendChild(eventCard(ev)));
+
+  const hk=document.getElementById('homeTasks'); hk.innerHTML='';
+  const open=tasks.filter(t=>!t.done).sort(taskSort).slice(0,5);
+  if(!open.length) hk.innerHTML='<div class="empty">Keine offenen Aufgaben. 👍</div>';
+  else open.forEach(t=>hk.appendChild(taskRow(t)));
+}
+
+/* Briefing */
+function briefingText(){
+  const today=iso(new Date());
+  const evs=eventsOn(today);
+  const open=tasks.filter(t=>!t.done).sort(taskSort);
+  const offen=fin.filter(f=>f.type==='rechnung'&&!f.paid);
+  const sum=offen.reduce((s,f)=>s+f.amount,0);
+  let out='🗓️ Tagesbriefing · '+fmtDate(today)+'\n';
+  out+='\n📦 Einsätze ('+evs.length+'):\n';
+  out+= evs.length ? evs.map(e=>'• '+(e.start?e.start+' ':'')+e.title+(e.loc?' – '+e.loc:'')).join('\n') : '• keine';
+  out+='\n\n✅ Offene Aufgaben ('+open.length+'):\n';
+  out+= open.length ? open.slice(0,8).map(t=>'• '+t.title+(t.due?' (bis '+fmtShort(t.due)+')':'')).join('\n') : '• keine';
+  if(offen.length) out+='\n\n💶 Offene Rechnungen: '+eur(sum)+' ('+offen.length+' Stück)';
+  out+='\n\n— CREATEZ GmbH';
+  return out;
+}
+document.getElementById('shareBriefing').onclick=async()=>{
+  const text=briefingText();
+  try{
+    if(navigator.share){ await navigator.share({title:'Tagesbriefing',text}); return }
+    await navigator.clipboard.writeText(text); toast('Briefing kopiert');
+  }catch(e){}
+};
+
+/* Quick actions */
+document.getElementById('qaEvent').onclick=()=>openEvent(null);
+document.getElementById('qaTask').onclick=()=>openTask(null);
+document.getElementById('qaFin').onclick=()=>openFin(null);
+document.getElementById('qaNote').onclick=()=>openNote();
+document.getElementById('qEvent').onclick=()=>{closeSheet('quickSheet');openEvent(null)};
+document.getElementById('qTask').onclick=()=>{closeSheet('quickSheet');openTask(null)};
+document.getElementById('qFin').onclick=()=>{closeSheet('quickSheet');openFin(null)};
+document.getElementById('qNote').onclick=()=>{closeSheet('quickSheet');openNote()};
+document.getElementById('qClose').onclick=()=>closeSheet('quickSheet');
+
+/* FAB: context-dependent */
+document.getElementById('fab').onclick=()=>{
+  if(activeView==='home') openSheet('quickSheet');
+  else if(activeView==='cal') openEvent(null);
+  else if(activeView==='tasks') openTask(null);
+  else if(activeView==='fin') openFin(null);
+};
+function applyFabSide(){ document.getElementById('fab').classList.toggle('left', !!DB.get('fabLeft',false)) }
+document.getElementById('fabSide').onclick=()=>{ DB.set('fabLeft', !DB.get('fabLeft',false)); applyFabSide(); toast('Plus-Button verschoben') };
 
 /* ---------- Calendar ---------- */
 let cursor=new Date(); cursor.setDate(1);
 let selDate=iso(new Date());
-const MONTHS=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
-const WD=['So','Mo','Di','Mi','Do','Fr','Sa'];
 
 function eventsOn(dateStr){ return events.filter(e=>e.date===dateStr).sort((a,b)=>(a.start||'').localeCompare(b.start||'')) }
 
 function renderCalendar(){
   document.getElementById('monthLabel').textContent = MONTHS[cursor.getMonth()]+' '+cursor.getFullYear();
   const days=document.getElementById('days'); days.innerHTML='';
-  const first=new Date(cursor); let startDow=(first.getDay()+6)%7; // Mo=0
+  const first=new Date(cursor); let startDow=(first.getDay()+6)%7;
   const daysInMonth=new Date(cursor.getFullYear(),cursor.getMonth()+1,0).getDate();
   const prevDays=new Date(cursor.getFullYear(),cursor.getMonth(),0).getDate();
   const todayStr=iso(new Date());
@@ -459,10 +734,13 @@ function eventCard(ev){
   el.querySelector('[data-edit]').onclick=()=>openEvent(ev);
   return el;
 }
-function esc(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])) }
-
 document.getElementById('prevM').onclick=()=>{cursor.setMonth(cursor.getMonth()-1);renderCalendar()};
 document.getElementById('nextM').onclick=()=>{cursor.setMonth(cursor.getMonth()+1);renderCalendar()};
+document.getElementById('goToday').onclick=()=>{
+  const now=new Date(); selDate=iso(now);
+  cursor=new Date(now.getFullYear(),now.getMonth(),1);
+  renderCalendar(); renderDay();
+};
 
 /* ---------- Event editor ---------- */
 let editing=null, pickColor=COLORS[0];
@@ -489,7 +767,6 @@ function openEvent(ev){
   document.getElementById('deleteEvent').classList.toggle('hidden',!ev);
   openSheet('eventSheet');
 }
-document.getElementById('fab').onclick=()=>openEvent(null);
 document.getElementById('saveEvent').onclick=()=>{
   const t=document.getElementById('fTitle').value.trim();
   if(!t){ toast('Bitte Titel eingeben'); return }
@@ -501,7 +778,8 @@ document.getElementById('saveEvent').onclick=()=>{
     note:document.getElementById('fNote').value.trim(), color:pickColor
   };
   if(editing){ Object.assign(editing,data); } else { data.id=uid(); events.push(data); }
-  save(); closeSheet('eventSheet'); selDate=data.date; cursor=new Date(data.date+'T00:00'); cursor.setDate(1);
+  save(); closeSheet('eventSheet'); selDate=data.date;
+  cursor=new Date(data.date+'T00:00'); cursor.setDate(1);
   renderAll(); toast('Gespeichert');
 };
 document.getElementById('deleteEvent').onclick=()=>{
@@ -511,14 +789,201 @@ document.getElementById('deleteEvent').onclick=()=>{
 };
 document.getElementById('closeSheet').onclick=()=>closeSheet('eventSheet');
 
+/* ---------- Tasks ---------- */
+let editingT=null, tFilter='open';
+function taskSort(a,b){
+  const da=a.due||'9999-12-31', db=b.due||'9999-12-31';
+  return da===db ? (PRIOW[a.prio]??1)-(PRIOW[b.prio]??1) : da.localeCompare(db);
+}
+function taskRow(t){
+  const el=document.createElement('div'); el.className='task'+(t.done?' done':'');
+  const today=iso(new Date());
+  const overdue=!t.done&&t.due&&t.due<today;
+  el.innerHTML=`<button class="cb">✓</button>
+    <div class="tt">
+      <div class="t">${esc(t.title)}</div>
+      <div class="meta" style="font-size:12px;${overdue?'color:var(--danger)':''}">
+        ${t.due?((overdue?'⚠️ überfällig · ':'')+'fällig '+fmtShort(t.due)):'ohne Frist'}
+        · <span style="color:${PRIOC[t.prio]||PRIOC.mittel}">●</span> ${esc(t.prio||'mittel')}
+      </div>
+    </div>
+    <button class="chip" data-edit>✏️</button>`;
+  el.querySelector('.cb').onclick=()=>{
+    t.done=!t.done; navigator.vibrate&&navigator.vibrate(15); save();
+    renderTasks(); renderHome(); toast(t.done?'Erledigt ✅':'Wieder offen');
+  };
+  el.querySelector('[data-edit]').onclick=()=>openTask(t);
+  return el;
+}
+document.querySelectorAll('[data-tfilter]').forEach(b=>b.onclick=()=>{
+  tFilter=b.dataset.tfilter;
+  document.querySelectorAll('[data-tfilter]').forEach(x=>x.classList.toggle('share',x===b));
+  renderTasks();
+});
+function renderTasks(){
+  const box=document.getElementById('tasksList'); box.innerHTML='';
+  let list=[...tasks];
+  if(tFilter==='open') list=list.filter(t=>!t.done);
+  if(tFilter==='done') list=list.filter(t=>t.done);
+  list.sort((a,b)=>(a.done?1:0)-(b.done?1:0) || taskSort(a,b));
+  if(!list.length){ box.innerHTML='<div class="empty">Keine Aufgaben.</div>'; return }
+  list.forEach(t=>box.appendChild(taskRow(t)));
+}
+function openTask(t){
+  editingT=t||null;
+  document.getElementById('tSheetTitle').textContent=t?'Aufgabe bearbeiten':'Neue Aufgabe';
+  document.getElementById('tTitle').value=t?.title||'';
+  document.getElementById('tDue').value=t?.due||'';
+  document.getElementById('tPrio').value=t?.prio||'mittel';
+  document.getElementById('tDelete').classList.toggle('hidden',!t);
+  openSheet('taskSheet');
+}
+document.getElementById('tSave').onclick=()=>{
+  const title=document.getElementById('tTitle').value.trim();
+  if(!title){ toast('Bitte Aufgabe eingeben'); return }
+  const data={title,due:document.getElementById('tDue').value,prio:document.getElementById('tPrio').value};
+  if(editingT) Object.assign(editingT,data);
+  else { data.id=uid(); data.done=false; tasks.push(data); }
+  save(); closeSheet('taskSheet'); renderTasks(); renderHome(); toast('Gespeichert');
+};
+document.getElementById('tDelete').onclick=()=>{
+  if(editingT&&confirm('Aufgabe löschen?')){ tasks=tasks.filter(x=>x!==editingT); save(); closeSheet('taskSheet'); renderTasks(); renderHome(); }
+};
+document.getElementById('tClose').onclick=()=>closeSheet('taskSheet');
+
+/* ---------- Finance ---------- */
+let editingF=null, fFilter='alle';
+function finRow(f){
+  const el=document.createElement('div'); el.className='task';
+  const isOut=f.type==='ausgabe';
+  const isOpenInv=f.type==='rechnung'&&!f.paid;
+  const cls=isOut?'minus':(isOpenInv?'open':'plus');
+  const badge=f.type==='rechnung'
+    ? `<button class="chip${f.paid?'':' share'}" data-paid style="${f.paid?'':'background:var(--warn);border-color:var(--warn);color:#161616'}">${f.paid?'BEZAHLT':'OFFEN'}</button>`
+    : '';
+  el.innerHTML=`<div class="tt">
+      <div class="t">${esc(f.label)}</div>
+      <div class="meta" style="font-size:12px">${fmtShort(f.date)} · ${TYPEL[f.type]||f.type}</div>
+    </div>
+    ${badge}
+    <div class="amount ${cls}">${isOut?'−':'+'} ${eur(f.amount)}</div>`;
+  el.style.cursor='pointer';
+  el.onclick=e=>{ if(e.target.closest('[data-paid]')) return; openFin(f); };
+  const pb=el.querySelector('[data-paid]');
+  if(pb) pb.onclick=e=>{ e.stopPropagation(); f.paid=!f.paid; save(); renderFin(); renderHome(); toast(f.paid?'Als bezahlt markiert ✅':'Als offen markiert'); };
+  return el;
+}
+document.querySelectorAll('[data-ffilter]').forEach(b=>b.onclick=()=>{
+  fFilter=b.dataset.ffilter;
+  document.querySelectorAll('[data-ffilter]').forEach(x=>x.classList.toggle('share',x===b));
+  renderFin();
+});
+function renderFin(){
+  const now=new Date(), mk=iso(now).slice(0,7);
+  document.getElementById('finMonthLabel').textContent='Finanzen · '+MONTHS[now.getMonth()]+' '+now.getFullYear();
+  const inSum=fin.filter(f=>f.date&&f.date.startsWith(mk)&&(f.type==='einnahme'||(f.type==='rechnung'&&f.paid))).reduce((s,f)=>s+f.amount,0);
+  const outSum=fin.filter(f=>f.date&&f.date.startsWith(mk)&&f.type==='ausgabe').reduce((s,f)=>s+f.amount,0);
+  const openSum=fin.filter(f=>f.type==='rechnung'&&!f.paid).reduce((s,f)=>s+f.amount,0);
+  document.getElementById('fsIn').textContent='+ '+eurShort(inSum);
+  document.getElementById('fsOut').textContent='− '+eurShort(outSum);
+  const saldo=inSum-outSum, fs=document.getElementById('fsSaldo');
+  fs.textContent=(saldo<0?'− ':'')+eurShort(Math.abs(saldo));
+  fs.style.color=saldo<0?'var(--danger)':'var(--ok)';
+  document.getElementById('fsOpen').textContent=eurShort(openSum);
+
+  const box=document.getElementById('finList'); box.innerHTML='';
+  let list=[...fin].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
+  if(fFilter!=='alle') list=list.filter(f=>f.type===fFilter);
+  if(!list.length){ box.innerHTML='<div class="empty">Keine Buchungen. Mit ＋ hinzufügen.</div>'; return }
+  list.forEach(f=>box.appendChild(finRow(f)));
+}
+function openFin(f){
+  editingF=f||null;
+  document.getElementById('fiSheetTitle').textContent=f?'Buchung bearbeiten':'Neue Buchung';
+  document.getElementById('fiType').value=f?.type||'einnahme';
+  document.getElementById('fiLabel').value=f?.label||'';
+  document.getElementById('fiAmount').value=f?String(f.amount).replace('.',','):'';
+  document.getElementById('fiDate').value=f?.date||iso(new Date());
+  document.getElementById('fiStatus').value=f?.paid?'bezahlt':'offen';
+  toggleFiStatus();
+  document.getElementById('fiDelete').classList.toggle('hidden',!f);
+  openSheet('finSheet');
+}
+function toggleFiStatus(){
+  document.getElementById('fiStatusWrap').style.display =
+    document.getElementById('fiType').value==='rechnung' ? 'block' : 'none';
+}
+document.getElementById('fiType').onchange=toggleFiStatus;
+document.getElementById('fiSave').onclick=()=>{
+  const label=document.getElementById('fiLabel').value.trim();
+  const amount=parseAmount(document.getElementById('fiAmount').value);
+  if(!label){ toast('Bitte Bezeichnung eingeben'); return }
+  if(!(amount>0)){ toast('Bitte gültigen Betrag eingeben'); return }
+  const type=document.getElementById('fiType').value;
+  const data={type,label,amount:Math.round(amount*100)/100,
+    date:document.getElementById('fiDate').value||iso(new Date()),
+    paid:type==='rechnung'?document.getElementById('fiStatus').value==='bezahlt':false};
+  if(editingF) Object.assign(editingF,data);
+  else { data.id=uid(); fin.push(data); }
+  save(); closeSheet('finSheet'); renderFin(); renderHome(); toast('Gespeichert');
+};
+document.getElementById('fiDelete').onclick=()=>{
+  if(editingF&&confirm('Buchung löschen?')){ fin=fin.filter(x=>x!==editingF); save(); closeSheet('finSheet'); renderFin(); renderHome(); }
+};
+document.getElementById('fiClose').onclick=()=>closeSheet('finSheet');
+document.getElementById('exportCsv').onclick=()=>{
+  if(!fin.length){ toast('Keine Buchungen'); return }
+  const rows=[['Datum','Typ','Bezeichnung','Betrag (EUR)','Status']];
+  [...fin].sort((a,b)=>(a.date||'').localeCompare(b.date||'')).forEach(f=>{
+    rows.push([f.date,TYPEL[f.type]||f.type,f.label.replace(/;/g,','),String(f.amount).replace('.',','),
+      f.type==='rechnung'?(f.paid?'bezahlt':'offen'):'']);
+  });
+  downloadFile('createz_finanzen.csv','﻿'+rows.map(r=>r.join(';')).join('\r\n'),'text/csv;charset=utf-8');
+  toast('CSV exportiert');
+};
+
+/* ---------- Notes ---------- */
+function renderNotes(){
+  const box=document.getElementById('notesList'); box.innerHTML='';
+  if(!notes.length){ box.innerHTML='<div class="empty">Keine Notizen.</div>'; return }
+  [...notes].sort((a,b)=>(b.ts||'').localeCompare(a.ts||'')).forEach(n=>{
+    const el=document.createElement('div'); el.className='note-card';
+    const d=n.ts?new Date(n.ts):null;
+    el.innerHTML=`<div class="txt">${esc(n.text)}</div>
+      <div class="row" style="justify-content:space-between;margin-top:8px">
+        <span class="meta" style="font-size:11px">${d?WD[d.getDay()]+', '+d.getDate()+'.'+(d.getMonth()+1)+'. '+pad(d.getHours())+':'+pad(d.getMinutes()):''}</span>
+        <div class="row" style="gap:6px">
+          <button class="chip" data-nshare>📤</button>
+          <button class="chip" data-ndel>🗑</button>
+        </div>
+      </div>`;
+    el.querySelector('[data-nshare]').onclick=async()=>{
+      try{ if(navigator.share){ await navigator.share({text:n.text}); return }
+        await navigator.clipboard.writeText(n.text); toast('Kopiert'); }catch(e){}
+    };
+    el.querySelector('[data-ndel]').onclick=()=>{
+      if(confirm('Notiz löschen?')){ notes=notes.filter(x=>x!==n); save(); renderNotes(); }
+    };
+    box.appendChild(el);
+  });
+}
+function openNote(){ document.getElementById('nText').value=''; openSheet('noteSheet'); }
+document.getElementById('addNote').onclick=()=>openNote();
+document.getElementById('nSave').onclick=()=>{
+  const text=document.getElementById('nText').value.trim();
+  if(!text){ toast('Bitte Text eingeben'); return }
+  notes.push({id:uid(),text,ts:new Date().toISOString()});
+  save(); closeSheet('noteSheet'); renderNotes(); toast('Notiz gespeichert');
+};
+document.getElementById('nClose').onclick=()=>closeSheet('noteSheet');
+
 /* ---------- Sheets ---------- */
 function openSheet(id){ document.getElementById(id).classList.add('open') }
 function closeSheet(id){ document.getElementById(id).classList.remove('open') }
 document.querySelectorAll('.sheet-bg').forEach(bg=>bg.addEventListener('click',e=>{ if(e.target===bg) bg.classList.remove('open') }));
 
-/* ---------- Sharing ---------- */
+/* ---------- Sharing (Einsätze / ICS / GCal / WA) ---------- */
 function evDateTime(ev){
-  // returns {startUTC,endUTC} in ICS basic format
   const d=ev.date.replace(/-/g,'');
   if(ev.start){
     const s=ev.start.replace(':','')+'00';
@@ -553,12 +1018,11 @@ function downloadFile(name, content, type){
 }
 function evText(ev){
   const t=ev.start?(ev.start+(ev.end?('–'+ev.end):'')+' Uhr'):'ganztägig';
-  return `📦 ${ev.title}\n📅 ${fmtDate(ev.date)} · ${t}\n${ev.type?('🏷️ '+ev.type+'\n'):''}${ev.loc?('📍 '+ev.loc+'\n'):''}${ev.partner?('👤 '+ev.partner+'\n'):''}${ev.note?('📝 '+ev.note+'\n'):''}— CREATEZ`;
+  return `📦 ${ev.title}\n📅 ${fmtDate(ev.date)} · ${t}\n${ev.type?('🏷️ '+ev.type+'\n'):''}${ev.loc?('📍 '+ev.loc+'\n'):''}${ev.partner?('👤 '+ev.partner+'\n'):''}${ev.note?('📝 '+ev.note+'\n'):''}— CREATEZ GmbH`;
 }
 function gcalLink(ev){
   const t=evDateTime(ev);
-  const dates=t.allDay?(t.s+'/'+t.e):(t.s+'/'+t.e);
-  const p=new URLSearchParams({action:'TEMPLATE',text:ev.title||'',dates:dates,
+  const p=new URLSearchParams({action:'TEMPLATE',text:ev.title||'',dates:t.s+'/'+t.e,
     details:[ev.type?('Typ: '+ev.type):'',ev.partner?('Partner: '+ev.partner):'',ev.note||''].filter(Boolean).join('\n'),
     location:ev.loc||''});
   return 'https://calendar.google.com/calendar/render?'+p.toString();
@@ -602,27 +1066,6 @@ document.getElementById('shareDay').onclick=async()=>{
   }catch(e){}
 };
 
-/* ---------- Jobs list ---------- */
-let jobFilter='all';
-document.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{
-  jobFilter=b.dataset.filter;
-  document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('share',x===b));
-  renderJobs();
-});
-function renderJobs(){
-  const box=document.getElementById('jobsList'); box.innerHTML='';
-  const today=iso(new Date());
-  let list=[...events].sort((a,b)=>(a.date+a.start).localeCompare(b.date+b.start));
-  if(jobFilter==='upcoming') list=list.filter(e=>e.date>=today);
-  if(jobFilter==='past') list=list.filter(e=>e.date<today);
-  if(!list.length){ box.innerHTML='<div class="empty">Keine Einsätze.</div>'; return }
-  let lastDate='';
-  list.forEach(ev=>{
-    if(ev.date!==lastDate){ const h=document.createElement('div'); h.className='muted'; h.style.cssText='font-size:12px;font-weight:700;margin:14px 2px 6px';h.textContent=fmtDate(ev.date); box.appendChild(h); lastDate=ev.date; }
-    box.appendChild(eventCard(ev));
-  });
-}
-
 /* ---------- Partners ---------- */
 let editingP=null;
 function renderPartners(){
@@ -630,9 +1073,9 @@ function renderPartners(){
   if(!partners.length){ box.innerHTML='<div class="empty">Noch keine Partner.</div>'; }
   partners.forEach(p=>{
     const el=document.createElement('div'); el.className='card'; el.style.marginBottom='10px';
-    el.innerHTML=`<div class="row"><div style="flex:1"><b>${esc(p.name)}</b>
-      ${p.phone?`<div class="meta muted" style="font-size:13px">📞 ${esc(p.phone)}</div>`:''}
-      ${p.note?`<div class="meta muted" style="font-size:13px">${esc(p.note)}</div>`:''}</div>
+    el.innerHTML=`<div class="row"><div style="flex:1;min-width:0"><b>${esc(p.name)}</b>
+      ${p.phone?`<div class="meta" style="font-size:13px">📞 ${esc(p.phone)}</div>`:''}
+      ${p.note?`<div class="meta" style="font-size:13px">${esc(p.note)}</div>`:''}</div>
       ${p.phone?`<a class="chip" href="tel:${esc(p.phone)}">📞</a>`:''}
       <button class="chip" data-edit>✏️</button></div>`;
     el.querySelector('[data-edit]').onclick=()=>openPartner(p);
@@ -653,20 +1096,18 @@ document.getElementById('pSave').onclick=()=>{
   const name=document.getElementById('pName').value.trim(); if(!name){toast('Name fehlt');return}
   const data={name,phone:document.getElementById('pPhone').value.trim(),note:document.getElementById('pNote').value.trim()};
   if(editingP) Object.assign(editingP,data); else { data.id=uid(); partners.push(data); }
-  save(); closeSheet('partnerSheet'); renderPartners(); toast('Gespeichert');
+  save(); closeSheet('partnerSheet'); renderPartners(); refreshPartnerOptions(); toast('Gespeichert');
 };
 document.getElementById('pDelete').onclick=()=>{
-  if(editingP&&confirm('Partner löschen?')){ partners=partners.filter(x=>x!==editingP); save(); closeSheet('partnerSheet'); renderPartners(); }
+  if(editingP&&confirm('Partner löschen?')){ partners=partners.filter(x=>x!==editingP); save(); closeSheet('partnerSheet'); renderPartners(); refreshPartnerOptions(); }
 };
 document.getElementById('pClose').onclick=()=>closeSheet('partnerSheet');
 
-/* ---------- Admin ---------- */
-function renderStats(){
-  const today=iso(new Date());
-  document.getElementById('stEvents').textContent=events.length;
-  document.getElementById('stUpcoming').textContent=events.filter(e=>e.date>=today).length;
-  document.getElementById('stPartners').textContent=partners.length;
-}
+/* ---------- Mehr: Einstellungen, ICS, Backup, PIN ---------- */
+const meName=document.getElementById('meName');
+meName.value=DB.get('name','Rui');
+meName.onchange=()=>{ DB.set('name', meName.value.trim()||'Rui'); renderHome(); toast('Name gespeichert'); };
+
 document.getElementById('exportIcs').onclick=()=>{
   if(!events.length){toast('Keine Einsätze');return}
   downloadFile('createz_kalender.ics', icsFor(events), 'text/calendar'); toast('Exportiert');
@@ -699,20 +1140,28 @@ function importIcs(text){
   });
   save(); renderAll(); toast(n+' Termine importiert');
 }
-document.getElementById('exportJson').onclick=()=>downloadFile('createz_backup.json', JSON.stringify({events,partners},null,2),'application/json');
+document.getElementById('exportJson').onclick=()=>downloadFile('createz_backup.json', JSON.stringify({events,partners,tasks,fin,notes},null,2),'application/json');
 document.getElementById('importJson').onclick=()=>document.getElementById('jsonFile').click();
 document.getElementById('jsonFile').onchange=e=>{
   const f=e.target.files[0]; if(!f)return; const r=new FileReader();
-  r.onload=()=>{ try{ const d=JSON.parse(r.result); if(d.events)events=d.events; if(d.partners)partners=d.partners; save(); renderAll(); toast('Backup importiert'); }catch(x){ toast('Ungültige Datei'); } e.target.value=''; };
+  r.onload=()=>{ try{
+      const d=JSON.parse(r.result);
+      if(d.events)events=d.events; if(d.partners)partners=d.partners;
+      if(d.tasks)tasks=d.tasks; if(d.fin)fin=d.fin; if(d.notes)notes=d.notes;
+      save(); renderAll(); toast('Backup importiert');
+    }catch(x){ toast('Ungültige Datei'); } e.target.value=''; };
   r.readAsText(f);
 };
 document.getElementById('changePin').onclick=()=>{ pinMode='set1'; pinBuffer='';
   document.getElementById('app').classList.add('hidden'); document.getElementById('login').classList.remove('hidden');
-  document.getElementById('loginSub').textContent='Superadmin-Zugang · Neue PIN'; document.getElementById('pinHint').classList.add('hidden'); renderDots(); };
+  document.getElementById('loginSub').textContent='Geschäftsführer-Zugang · Neue PIN'; document.getElementById('pinHint').classList.add('hidden'); renderDots(); };
 document.getElementById('logout').onclick=lock;
 
 /* ---------- Render all ---------- */
-function renderAll(){ renderCalendar(); renderDay(); renderStats(); refreshPartnerOptions(); }
+function renderAll(){
+  renderHome(); renderCalendar(); renderDay(); renderTasks(); renderFin();
+  renderPartners(); renderNotes(); refreshPartnerOptions(); applyFabSide();
+}
 
 /* ---------- PWA / install ---------- */
 if('serviceWorker' in navigator){ window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{})); }
@@ -724,13 +1173,12 @@ window.addEventListener('beforeinstallprompt',e=>{
   h.style.cursor='pointer';
   h.onclick=async()=>{ if(deferredPrompt){ deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt=null; h.classList.add('hidden'); } };
 });
-// iOS hint
 (function(){
   const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
   const standalone=window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
   if(isIOS && !standalone){
     const h=document.getElementById('installHint'); h.classList.remove('hidden');
-    h.innerHTML='📲 <b>App installieren:</b> unten auf „Teilen“ → „Zum Home-Bildschirm“.';
+    h.innerHTML='📲 <b>App installieren:</b> unten auf „Teilen" → „Zum Home-Bildschirm".';
   }
 })();
 

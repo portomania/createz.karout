@@ -1,7 +1,7 @@
 {
-  "name": "CREATEZ Superadmin Portal",
+  "name": "CREATEZ Geschäftsführer Cockpit",
   "short_name": "CREATEZ",
-  "description": "Superadmin-Portal für Transportkoordination mit Einsatz-Kalender.",
+  "description": "Geschäftsführer-Cockpit der CREATEZ GmbH: Einsatz-Kalender, Aufgaben, Finanzen und Notizen – mobil und offline.",
   "start_url": "./app.html",
   "scope": "./",
   "display": "standalone",
