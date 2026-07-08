@@ -1,0 +1,742 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#111418">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="CREATEZ">
+<link rel="apple-touch-icon" href="./icon.svg">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<link rel="manifest" href="./manifest.webmanifest">
+<title>CREATEZ – Superadmin Portal</title>
+<style>
+  :root{
+    --bg:#111418; --surface:#181d24; --surface2:#1f2731; --line:#2a333f;
+    --text:#e8edf5; --muted:#93a1b3; --accent:#2f80ff; --accent2:#1b5fd9;
+    --ok:#2ec16b; --warn:#f5a623; --danger:#f2545b;
+    --safe-top:env(safe-area-inset-top); --safe-bottom:env(safe-area-inset-bottom);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+    background:var(--bg); color:var(--text); line-height:1.5;
+    overscroll-behavior-y:none;
+  }
+  button,input,select,textarea{font-family:inherit;font-size:16px}
+  .app{display:flex;flex-direction:column;height:100dvh;max-width:560px;margin:0 auto;position:relative}
+
+  /* Topbar */
+  .topbar{
+    padding:calc(var(--safe-top) + 14px) 16px 12px; background:var(--surface);
+    border-bottom:1px solid var(--line); display:flex;align-items:center;gap:10px;
+    position:sticky;top:0;z-index:20;
+  }
+  .brand{display:flex;flex-direction:column;line-height:1.15}
+  .brand b{font-size:17px;letter-spacing:.5px}
+  .brand small{color:var(--muted);font-size:11px}
+  .logo{width:34px;height:34px;border-radius:9px;background:var(--accent);
+    display:grid;place-items:center;font-weight:800;color:#fff;font-size:15px}
+  .badge{margin-left:auto;background:linear-gradient(135deg,#f5a623,#f2545b);color:#161616;
+    font-weight:700;font-size:10px;padding:5px 9px;border-radius:999px;letter-spacing:.4px}
+
+  /* Views */
+  .view{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 16px 96px}
+  .hidden{display:none!important}
+
+  /* Bottom nav */
+  .nav{
+    position:sticky;bottom:0;display:flex;background:var(--surface);
+    border-top:1px solid var(--line);padding:6px 6px calc(6px + var(--safe-bottom));z-index:20;
+  }
+  .nav button{
+    flex:1;background:none;border:0;color:var(--muted);padding:8px 4px;border-radius:12px;
+    display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;font-weight:600;
+  }
+  .nav button.active{color:var(--accent)}
+  .nav svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+  /* Cards / generic */
+  h2.section{font-size:13px;text-transform:uppercase;letter-spacing:.8px;color:var(--muted);margin:22px 2px 10px}
+  .card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px}
+  .row{display:flex;align-items:center;gap:12px}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .stat{flex:1;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px}
+  .stat .n{font-size:26px;font-weight:800}
+  .stat .l{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+  .muted{color:var(--muted)}
+  .pill{font-size:11px;padding:3px 9px;border-radius:999px;background:var(--surface2);color:var(--muted);font-weight:600}
+
+  /* Buttons */
+  .btn{border:0;border-radius:12px;padding:12px 16px;font-weight:700;color:#fff;background:var(--accent);cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+  .btn:active{transform:scale(.98)}
+  .btn.block{width:100%}
+  .btn.ghost{background:var(--surface2);color:var(--text);border:1px solid var(--line)}
+  .btn.sm{padding:8px 12px;font-size:13px;border-radius:10px}
+  .btn.danger{background:var(--danger)}
+  .btn.ok{background:var(--ok);color:#08130b}
+
+  /* Calendar */
+  .cal-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .cal-head b{font-size:18px}
+  .nav-arrow{width:40px;height:40px;border-radius:12px;background:var(--surface2);border:1px solid var(--line);color:var(--text);font-size:20px;display:grid;place-items:center}
+  .weekdays,.days{display:grid;grid-template-columns:repeat(7,1fr);gap:5px}
+  .weekdays div{text-align:center;color:var(--muted);font-size:11px;font-weight:700;padding:4px 0}
+  .day{aspect-ratio:1;border-radius:12px;background:var(--surface);border:1px solid var(--line);
+    display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding-top:6px;position:relative;font-size:14px;font-weight:600;cursor:pointer}
+  .day.out{opacity:.32}
+  .day.today{border-color:var(--accent)}
+  .day.sel{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .dots{display:flex;gap:2px;position:absolute;bottom:6px}
+  .dot{width:5px;height:5px;border-radius:50%;background:var(--accent)}
+  .day.sel .dot{background:#fff}
+
+  /* Event list */
+  .event{display:flex;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px}
+  .event .bar{width:5px;border-radius:6px;background:var(--accent);flex:none}
+  .event .body{flex:1;min-width:0}
+  .event .t{font-weight:700}
+  .event .meta{font-size:12.5px;color:var(--muted);margin-top:2px}
+  .event .acts{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
+  .chip{font-size:11px;font-weight:700;padding:6px 10px;border-radius:999px;background:var(--surface2);border:1px solid var(--line);color:var(--text);display:inline-flex;gap:5px;align-items:center}
+  .chip.share{background:var(--accent);border-color:var(--accent);color:#fff}
+  .empty{text-align:center;color:var(--muted);padding:30px 10px;font-size:14px}
+
+  /* FAB */
+  .fab{position:absolute;right:18px;bottom:calc(78px + var(--safe-bottom));width:58px;height:58px;border-radius:50%;
+    background:var(--accent);color:#fff;border:0;font-size:30px;box-shadow:0 8px 24px rgba(47,128,255,.45);z-index:15}
+
+  /* Modal / sheet */
+  .sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:40;display:none;align-items:flex-end;justify-content:center}
+  .sheet-bg.open{display:flex}
+  .sheet{background:var(--surface);width:100%;max-width:560px;border-radius:22px 22px 0 0;padding:8px 16px calc(20px + var(--safe-bottom));max-height:92dvh;overflow-y:auto;animation:up .22s ease}
+  @keyframes up{from{transform:translateY(30px);opacity:.5}to{transform:none;opacity:1}}
+  .grab{width:42px;height:5px;border-radius:3px;background:var(--line);margin:8px auto 14px}
+  label.f{display:block;font-size:12px;color:var(--muted);font-weight:700;margin:12px 2px 6px;text-transform:uppercase;letter-spacing:.4px}
+  .input,select.input,textarea.input{width:100%;background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:12px;color:var(--text)}
+  textarea.input{min-height:70px;resize:vertical}
+  .colors{display:flex;gap:10px;margin-top:6px}
+  .colors button{width:34px;height:34px;border-radius:50%;border:3px solid transparent}
+  .colors button.on{border-color:#fff}
+  .sheet-title{font-size:18px;font-weight:800;margin:2px 2px 4px}
+
+  /* Login */
+  .login{position:fixed;inset:0;background:var(--bg);z-index:60;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center}
+  .login .logo{width:64px;height:64px;border-radius:18px;font-size:26px;margin-bottom:18px}
+  .pin{display:flex;gap:10px;margin:18px 0}
+  .pin .d{width:16px;height:16px;border-radius:50%;border:2px solid var(--muted)}
+  .pin .d.on{background:var(--accent);border-color:var(--accent)}
+  .keys{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:min(320px,80vw)}
+  .keys button{aspect-ratio:1.6;border-radius:16px;background:var(--surface);border:1px solid var(--line);color:var(--text);font-size:22px;font-weight:700}
+  .keys button.fn{font-size:14px;color:var(--muted)}
+  .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(90px + var(--safe-bottom));background:#000;color:#fff;padding:11px 16px;border-radius:12px;font-size:13px;font-weight:600;z-index:80;opacity:0;transition:.25s;pointer-events:none;max-width:88vw;text-align:center}
+  .toast.show{opacity:1}
+  .install-hint{background:var(--surface2);border:1px dashed var(--accent);border-radius:14px;padding:12px;font-size:13px;color:var(--muted);margin-bottom:12px}
+  a{color:var(--accent)}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div class="login" id="login">
+  <div class="logo">CZ</div>
+  <div style="font-size:20px;font-weight:800">CREATEZ Portal</div>
+  <div class="muted" style="font-size:13px" id="loginSub">Superadmin-Zugang · PIN eingeben</div>
+  <div class="pin" id="pinDots"></div>
+  <div class="keys" id="keys"></div>
+  <div class="muted" id="pinHint" style="font-size:12px;margin-top:18px">Erst-PIN: <b>1234</b> · danach im Admin änderbar</div>
+</div>
+
+<!-- APP -->
+<div class="app hidden" id="app">
+  <div class="topbar">
+    <div class="logo">CZ</div>
+    <div class="brand"><b>CREATEZ</b><small>Transportkoordination</small></div>
+    <span class="badge">SUPERADMIN</span>
+  </div>
+
+  <!-- KALENDER -->
+  <div class="view" id="view-cal">
+    <div class="install-hint hidden" id="installHint"></div>
+    <div class="cal-head">
+      <button class="nav-arrow" id="prevM">‹</button>
+      <b id="monthLabel"></b>
+      <button class="nav-arrow" id="nextM">›</button>
+    </div>
+    <div class="weekdays"><div>Mo</div><div>Di</div><div>Mi</div><div>Do</div><div>Fr</div><div>Sa</div><div>So</div></div>
+    <div class="days" id="days"></div>
+
+    <div class="row" style="margin:18px 2px 8px;justify-content:space-between">
+      <b id="dayLabel" style="font-size:16px"></b>
+      <button class="chip share" id="shareDay">📤 Tag teilen</button>
+    </div>
+    <div id="dayEvents"></div>
+  </div>
+
+  <!-- AUFTRÄGE (alle Termine) -->
+  <div class="view hidden" id="view-jobs">
+    <h2 class="section">Alle Einsätze</h2>
+    <div class="row" style="gap:8px;margin-bottom:12px">
+      <button class="chip" data-filter="all">Alle</button>
+      <button class="chip" data-filter="upcoming">Kommend</button>
+      <button class="chip" data-filter="past">Vergangen</button>
+    </div>
+    <div id="jobsList"></div>
+  </div>
+
+  <!-- PARTNER -->
+  <div class="view hidden" id="view-partners">
+    <h2 class="section">Einsatzpartner</h2>
+    <div id="partnersList"></div>
+    <button class="btn ghost block" id="addPartner" style="margin-top:8px">+ Partner hinzufügen</button>
+  </div>
+
+  <!-- ADMIN -->
+  <div class="view hidden" id="view-admin">
+    <h2 class="section">Übersicht</h2>
+    <div class="row" style="gap:12px">
+      <div class="stat"><div class="n" id="stEvents">0</div><div class="l">Einsätze</div></div>
+      <div class="stat"><div class="n" id="stUpcoming">0</div><div class="l">Kommend</div></div>
+      <div class="stat"><div class="n" id="stPartners">0</div><div class="l">Partner</div></div>
+    </div>
+
+    <h2 class="section">Kalender teilen</h2>
+    <div class="card">
+      <div class="muted" style="font-size:13px;margin-bottom:12px">Kalender exportieren/importieren – kompatibel mit Google Kalender, Apple Kalender & Outlook.</div>
+      <button class="btn block" id="exportIcs">📅 Ganzen Kalender als .ics exportieren</button>
+      <button class="btn ghost block" id="shareAll" style="margin-top:10px">📤 Kalender teilen (Handy-Menü)</button>
+      <button class="btn ghost block" id="importIcs" style="margin-top:10px">📥 .ics importieren</button>
+      <input type="file" id="icsFile" accept=".ics,text/calendar" class="hidden">
+    </div>
+
+    <h2 class="section">Daten</h2>
+    <div class="card">
+      <button class="btn ghost block" id="exportJson">⬇︎ Backup exportieren (JSON)</button>
+      <button class="btn ghost block" id="importJson" style="margin-top:10px">⬆︎ Backup importieren</button>
+      <input type="file" id="jsonFile" accept="application/json,.json" class="hidden">
+    </div>
+
+    <h2 class="section">Sicherheit</h2>
+    <div class="card">
+      <button class="btn ghost block" id="changePin">🔒 PIN ändern</button>
+      <button class="btn danger block" id="logout" style="margin-top:10px">Abmelden</button>
+    </div>
+    <div class="muted" style="font-size:11px;text-align:center;margin-top:20px">CREATEZ Superadmin Portal · lokal auf diesem Gerät gespeichert</div>
+  </div>
+
+  <!-- NAV -->
+  <div class="nav" id="nav">
+    <button data-view="cal" class="active">
+      <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>Kalender</button>
+    <button data-view="jobs">
+      <svg viewBox="0 0 24 24"><path d="M3 7h18M3 12h18M3 17h18"/></svg>Einsätze</button>
+    <button data-view="partners">
+      <svg viewBox="0 0 24 24"><circle cx="9" cy="8" r="3"/><path d="M4 20c0-3 2.5-5 5-5s5 2 5 5M16 11a3 3 0 100-6M20 20c0-2.5-1.5-4.5-4-4.8"/></svg>Partner</button>
+    <button data-view="admin">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.6 1.6 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.6 1.6 0 00-1.8-.3 1.6 1.6 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.6 1.6 0 00-1-1.5 1.6 1.6 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.6 1.6 0 00.3-1.8 1.6 1.6 0 00-1.5-1H3a2 2 0 110-4h.1a1.6 1.6 0 001.5-1 1.6 1.6 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.6 1.6 0 001.8.3H9a1.6 1.6 0 001-1.5V3a2 2 0 114 0v.1a1.6 1.6 0 001 1.5 1.6 1.6 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.6 1.6 0 00-.3 1.8V9a1.6 1.6 0 001.5 1H21a2 2 0 110 4h-.1a1.6 1.6 0 00-1.5 1z"/></svg>Admin</button>
+  </div>
+
+  <button class="fab" id="fab">＋</button>
+</div>
+
+<!-- EVENT SHEET -->
+<div class="sheet-bg" id="eventSheet">
+  <div class="sheet">
+    <div class="grab"></div>
+    <div class="sheet-title" id="sheetTitle">Neuer Einsatz</div>
+    <label class="f">Titel</label>
+    <input class="input" id="fTitle" placeholder="z.B. Kurierfahrt München → Augsburg">
+    <div class="grid2">
+      <div><label class="f">Datum</label><input class="input" type="date" id="fDate"></div>
+      <div><label class="f">Typ</label>
+        <select class="input" id="fType">
+          <option>Transport</option><option>Kurier</option><option>Termin</option><option>Bereitschaft</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid2">
+      <div><label class="f">Von</label><input class="input" type="time" id="fStart"></div>
+      <div><label class="f">Bis</label><input class="input" type="time" id="fEnd"></div>
+    </div>
+    <label class="f">Ort / Route</label>
+    <input class="input" id="fLoc" placeholder="Abhol- / Zielort">
+    <label class="f">Partner / Fahrer</label>
+    <input class="input" id="fPartner" placeholder="z.B. Kahrout Transporte" list="partnerOptions">
+    <datalist id="partnerOptions"></datalist>
+    <label class="f">Notiz</label>
+    <textarea class="input" id="fNote" placeholder="Details, Kontakt, Ladung …"></textarea>
+    <label class="f">Farbe</label>
+    <div class="colors" id="colors"></div>
+    <div class="row" style="gap:10px;margin-top:20px">
+      <button class="btn ok block" id="saveEvent">Speichern</button>
+    </div>
+    <button class="btn danger block hidden" id="deleteEvent" style="margin-top:10px">Löschen</button>
+    <button class="btn ghost block" id="closeSheet" style="margin-top:10px">Abbrechen</button>
+  </div>
+</div>
+
+<!-- SHARE SHEET -->
+<div class="sheet-bg" id="shareSheet">
+  <div class="sheet">
+    <div class="grab"></div>
+    <div class="sheet-title">Einsatz teilen</div>
+    <div class="muted" id="sharePreview" style="font-size:13px;margin:4px 2px 16px"></div>
+    <button class="btn block" id="shShare">📤 Teilen (Handy-Menü)</button>
+    <button class="btn ghost block" id="shWa" style="margin-top:10px">💬 Per WhatsApp senden</button>
+    <button class="btn ghost block" id="shGcal" style="margin-top:10px">📆 Zu Google Kalender hinzufügen</button>
+    <button class="btn ghost block" id="shIcs" style="margin-top:10px">📅 Als .ics herunterladen</button>
+    <button class="btn ghost block" id="shCopy" style="margin-top:10px">📋 Text kopieren</button>
+    <button class="btn ghost block" id="shClose" style="margin-top:14px">Schließen</button>
+  </div>
+</div>
+
+<!-- PARTNER SHEET -->
+<div class="sheet-bg" id="partnerSheet">
+  <div class="sheet">
+    <div class="grab"></div>
+    <div class="sheet-title" id="pSheetTitle">Partner</div>
+    <label class="f">Name</label><input class="input" id="pName" placeholder="Firma / Fahrer">
+    <label class="f">Telefon</label><input class="input" id="pPhone" placeholder="+49 …" type="tel">
+    <label class="f">Notiz</label><input class="input" id="pNote" placeholder="Fahrzeug, Verfügbarkeit …">
+    <button class="btn ok block" id="pSave" style="margin-top:18px">Speichern</button>
+    <button class="btn danger block hidden" id="pDelete" style="margin-top:10px">Löschen</button>
+    <button class="btn ghost block" id="pClose" style="margin-top:10px">Abbrechen</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+/* ---------- Storage ---------- */
+const DB = {
+  get(k, d){ try{ return JSON.parse(localStorage.getItem('cz_'+k)) ?? d }catch(e){ return d } },
+  set(k, v){ localStorage.setItem('cz_'+k, JSON.stringify(v)) }
+};
+let events   = DB.get('events', []);
+let partners = DB.get('partners', [{id:uid(),name:'Kahrout Transporte',phone:'',note:'Flexibler Einsatzpartner'}]);
+const COLORS = ['#2f80ff','#2ec16b','#f5a623','#f2545b','#a06bff','#18b6c9'];
+
+function uid(){ return 'x'+Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-3) }
+function save(){ DB.set('events',events); DB.set('partners',partners) }
+function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2200) }
+const pad=n=>String(n).padStart(2,'0');
+const iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+
+/* ---------- Auth (PIN) ---------- */
+async function hash(s){
+  const buf=await crypto.subtle.digest('SHA-256', new TextEncoder().encode('cz$'+s));
+  return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+let pinBuffer='', pinMode='login'; // login | set1 | set2
+let tmpPin='';
+
+function renderKeys(){
+  const keys=document.getElementById('keys');
+  const layout=['1','2','3','4','5','6','7','8','9','C','0','⌫'];
+  keys.innerHTML='';
+  layout.forEach(k=>{
+    const b=document.createElement('button');
+    b.textContent=k; if(k==='C'||k==='⌫') b.className='fn';
+    b.onclick=()=>pinPress(k); keys.appendChild(b);
+  });
+}
+function renderDots(){
+  const d=document.getElementById('pinDots'); d.innerHTML='';
+  for(let i=0;i<4;i++){ const s=document.createElement('div'); s.className='d'+(i<pinBuffer.length?' on':''); d.appendChild(s) }
+}
+async function pinPress(k){
+  if(k==='C'){ pinBuffer=''; renderDots(); return }
+  if(k==='⌫'){ pinBuffer=pinBuffer.slice(0,-1); renderDots(); return }
+  if(pinBuffer.length>=4) return;
+  pinBuffer+=k; renderDots();
+  if(pinBuffer.length===4) setTimeout(handlePin,120);
+}
+async function handlePin(){
+  const entered=pinBuffer; pinBuffer='';
+  const stored=DB.get('pinHash', null);
+  if(pinMode==='login'){
+    const h=await hash(entered);
+    const ok = stored ? h===stored : entered==='1234';
+    if(ok){ if(!stored) DB.set('pinHash', await hash('1234')); enterApp(); }
+    else { toast('Falsche PIN'); navigator.vibrate&&navigator.vibrate(200); renderDots(); }
+  } else if(pinMode==='set1'){
+    tmpPin=entered; pinMode='set2';
+    document.getElementById('loginSub').textContent='Neue PIN bestätigen';
+    renderDots();
+  } else if(pinMode==='set2'){
+    if(entered===tmpPin){ DB.set('pinHash', await hash(entered)); toast('PIN geändert'); pinMode='login'; enterApp(); }
+    else { toast('PIN stimmt nicht überein'); pinMode='set1'; document.getElementById('loginSub').textContent='Superadmin-Zugang · Neue PIN'; renderDots(); }
+  }
+}
+function enterApp(){
+  document.getElementById('login').classList.add('hidden');
+  document.getElementById('app').classList.remove('hidden');
+  renderAll();
+}
+function lock(){
+  document.getElementById('app').classList.add('hidden');
+  document.getElementById('login').classList.remove('hidden');
+  pinMode='login'; pinBuffer=''; document.getElementById('loginSub').textContent='Superadmin-Zugang · PIN eingeben';
+  document.getElementById('pinHint').classList.toggle('hidden', !!DB.get('pinHash',null));
+  renderDots();
+}
+
+/* ---------- Navigation ---------- */
+document.getElementById('nav').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  document.querySelectorAll('#nav button').forEach(x=>x.classList.toggle('active',x===b));
+  document.querySelectorAll('.view').forEach(v=>v.classList.add('hidden'));
+  document.getElementById('view-'+b.dataset.view).classList.remove('hidden');
+  document.getElementById('fab').style.display = (b.dataset.view==='cal'||b.dataset.view==='jobs')?'block':'none';
+  if(b.dataset.view==='admin') renderStats();
+  if(b.dataset.view==='jobs') renderJobs();
+  if(b.dataset.view==='partners') renderPartners();
+});
+
+/* ---------- Calendar ---------- */
+let cursor=new Date(); cursor.setDate(1);
+let selDate=iso(new Date());
+const MONTHS=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+const WD=['So','Mo','Di','Mi','Do','Fr','Sa'];
+
+function eventsOn(dateStr){ return events.filter(e=>e.date===dateStr).sort((a,b)=>(a.start||'').localeCompare(b.start||'')) }
+
+function renderCalendar(){
+  document.getElementById('monthLabel').textContent = MONTHS[cursor.getMonth()]+' '+cursor.getFullYear();
+  const days=document.getElementById('days'); days.innerHTML='';
+  const first=new Date(cursor); let startDow=(first.getDay()+6)%7; // Mo=0
+  const daysInMonth=new Date(cursor.getFullYear(),cursor.getMonth()+1,0).getDate();
+  const prevDays=new Date(cursor.getFullYear(),cursor.getMonth(),0).getDate();
+  const todayStr=iso(new Date());
+  const cells=[];
+  for(let i=startDow-1;i>=0;i--) cells.push({d:prevDays-i,out:true,m:cursor.getMonth()-1});
+  for(let d=1;d<=daysInMonth;d++) cells.push({d,out:false,m:cursor.getMonth()});
+  while(cells.length%7!==0||cells.length<42) cells.push({d:cells.length-startDow-daysInMonth+1,out:true,m:cursor.getMonth()+1});
+  cells.slice(0,42).forEach(c=>{
+    const dt=new Date(cursor.getFullYear(),c.m,c.d);
+    const ds=iso(dt);
+    const el=document.createElement('div');
+    el.className='day'+(c.out?' out':'')+(ds===todayStr?' today':'')+(ds===selDate?' sel':'');
+    el.innerHTML=`<span>${c.d}</span>`;
+    const evs=eventsOn(ds);
+    if(evs.length){
+      const dots=document.createElement('div'); dots.className='dots';
+      evs.slice(0,3).forEach(ev=>{const dd=document.createElement('div');dd.className='dot';dd.style.background=ev.color||'#2f80ff';dots.appendChild(dd)});
+      el.appendChild(dots);
+    }
+    el.onclick=()=>{ selDate=ds; renderCalendar(); renderDay(); };
+    days.appendChild(el);
+  });
+}
+function fmtDate(ds){ const d=new Date(ds+'T00:00'); return `${WD[d.getDay()]}, ${d.getDate()}. ${MONTHS[d.getMonth()]}` }
+function renderDay(){
+  document.getElementById('dayLabel').textContent=fmtDate(selDate);
+  const box=document.getElementById('dayEvents'); box.innerHTML='';
+  const evs=eventsOn(selDate);
+  if(!evs.length){ box.innerHTML='<div class="empty">Keine Einsätze an diesem Tag.<br>Mit ＋ hinzufügen.</div>'; return }
+  evs.forEach(ev=>box.appendChild(eventCard(ev)));
+}
+function eventCard(ev){
+  const el=document.createElement('div'); el.className='event';
+  const time = ev.start ? (ev.start + (ev.end?('–'+ev.end):'')) : 'ganztägig';
+  el.innerHTML=`
+    <div class="bar" style="background:${ev.color||'#2f80ff'}"></div>
+    <div class="body">
+      <div class="t">${esc(ev.title||'(ohne Titel)')}</div>
+      <div class="meta">🕑 ${time} · ${esc(ev.type||'')}</div>
+      ${ev.loc?`<div class="meta">📍 ${esc(ev.loc)}</div>`:''}
+      ${ev.partner?`<div class="meta">👤 ${esc(ev.partner)}</div>`:''}
+      ${ev.note?`<div class="meta">📝 ${esc(ev.note)}</div>`:''}
+      <div class="acts">
+        <button class="chip share" data-share>📤 Teilen</button>
+        <button class="chip" data-edit>✏️ Bearbeiten</button>
+      </div>
+    </div>`;
+  el.querySelector('[data-share]').onclick=()=>openShare(ev);
+  el.querySelector('[data-edit]').onclick=()=>openEvent(ev);
+  return el;
+}
+function esc(s){ return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])) }
+
+document.getElementById('prevM').onclick=()=>{cursor.setMonth(cursor.getMonth()-1);renderCalendar()};
+document.getElementById('nextM').onclick=()=>{cursor.setMonth(cursor.getMonth()+1);renderCalendar()};
+
+/* ---------- Event editor ---------- */
+let editing=null, pickColor=COLORS[0];
+function renderColors(){
+  const c=document.getElementById('colors'); c.innerHTML='';
+  COLORS.forEach(col=>{const b=document.createElement('button');b.style.background=col;b.className=col===pickColor?'on':'';b.onclick=()=>{pickColor=col;renderColors()};c.appendChild(b)});
+}
+function refreshPartnerOptions(){
+  const dl=document.getElementById('partnerOptions'); dl.innerHTML='';
+  partners.forEach(p=>{const o=document.createElement('option');o.value=p.name;dl.appendChild(o)});
+}
+function openEvent(ev){
+  editing=ev||null;
+  document.getElementById('sheetTitle').textContent=ev?'Einsatz bearbeiten':'Neuer Einsatz';
+  document.getElementById('fTitle').value=ev?.title||'';
+  document.getElementById('fDate').value=ev?.date||selDate;
+  document.getElementById('fType').value=ev?.type||'Transport';
+  document.getElementById('fStart').value=ev?.start||'';
+  document.getElementById('fEnd').value=ev?.end||'';
+  document.getElementById('fLoc').value=ev?.loc||'';
+  document.getElementById('fPartner').value=ev?.partner||'';
+  document.getElementById('fNote').value=ev?.note||'';
+  pickColor=ev?.color||COLORS[0]; renderColors(); refreshPartnerOptions();
+  document.getElementById('deleteEvent').classList.toggle('hidden',!ev);
+  openSheet('eventSheet');
+}
+document.getElementById('fab').onclick=()=>openEvent(null);
+document.getElementById('saveEvent').onclick=()=>{
+  const t=document.getElementById('fTitle').value.trim();
+  if(!t){ toast('Bitte Titel eingeben'); return }
+  const data={
+    title:t, date:document.getElementById('fDate').value||selDate,
+    type:document.getElementById('fType').value,
+    start:document.getElementById('fStart').value, end:document.getElementById('fEnd').value,
+    loc:document.getElementById('fLoc').value.trim(), partner:document.getElementById('fPartner').value.trim(),
+    note:document.getElementById('fNote').value.trim(), color:pickColor
+  };
+  if(editing){ Object.assign(editing,data); } else { data.id=uid(); events.push(data); }
+  save(); closeSheet('eventSheet'); selDate=data.date; cursor=new Date(data.date+'T00:00'); cursor.setDate(1);
+  renderAll(); toast('Gespeichert');
+};
+document.getElementById('deleteEvent').onclick=()=>{
+  if(!editing) return;
+  if(!confirm('Diesen Einsatz löschen?')) return;
+  events=events.filter(e=>e!==editing); save(); closeSheet('eventSheet'); renderAll(); toast('Gelöscht');
+};
+document.getElementById('closeSheet').onclick=()=>closeSheet('eventSheet');
+
+/* ---------- Sheets ---------- */
+function openSheet(id){ document.getElementById(id).classList.add('open') }
+function closeSheet(id){ document.getElementById(id).classList.remove('open') }
+document.querySelectorAll('.sheet-bg').forEach(bg=>bg.addEventListener('click',e=>{ if(e.target===bg) bg.classList.remove('open') }));
+
+/* ---------- Sharing ---------- */
+function evDateTime(ev){
+  // returns {startUTC,endUTC} in ICS basic format
+  const d=ev.date.replace(/-/g,'');
+  if(ev.start){
+    const s=ev.start.replace(':','')+'00';
+    const e=(ev.end||ev.start).replace(':','')+'00';
+    return {allDay:false, s:d+'T'+s, e:d+'T'+e};
+  }
+  const next=new Date(ev.date+'T00:00'); next.setDate(next.getDate()+1);
+  return {allDay:true, s:d, e:iso(next).replace(/-/g,'')};
+}
+function icsFor(list){
+  const lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//CREATEZ//Portal//DE','CALSCALE:GREGORIAN','METHOD:PUBLISH'];
+  list.forEach(ev=>{
+    const t=evDateTime(ev);
+    lines.push('BEGIN:VEVENT');
+    lines.push('UID:'+(ev.id||uid())+'@createz');
+    if(t.allDay){ lines.push('DTSTART;VALUE=DATE:'+t.s); lines.push('DTEND;VALUE=DATE:'+t.e); }
+    else { lines.push('DTSTART:'+t.s); lines.push('DTEND:'+t.e); }
+    lines.push('SUMMARY:'+icsEsc(ev.title||''));
+    if(ev.loc) lines.push('LOCATION:'+icsEsc(ev.loc));
+    const desc=[ev.type?('Typ: '+ev.type):'', ev.partner?('Partner: '+ev.partner):'', ev.note||''].filter(Boolean).join('\\n');
+    if(desc) lines.push('DESCRIPTION:'+icsEsc(desc));
+    lines.push('END:VEVENT');
+  });
+  lines.push('END:VCALENDAR');
+  return lines.join('\r\n');
+}
+function icsEsc(s){ return String(s).replace(/[\\;,]/g,m=>'\\'+m).replace(/\n/g,'\\n') }
+function downloadFile(name, content, type){
+  const blob=new Blob([content],{type}); const url=URL.createObjectURL(blob);
+  const a=document.createElement('a'); a.href=url; a.download=name; a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function evText(ev){
+  const t=ev.start?(ev.start+(ev.end?('–'+ev.end):'')+' Uhr'):'ganztägig';
+  return `📦 ${ev.title}\n📅 ${fmtDate(ev.date)} · ${t}\n${ev.type?('🏷️ '+ev.type+'\n'):''}${ev.loc?('📍 '+ev.loc+'\n'):''}${ev.partner?('👤 '+ev.partner+'\n'):''}${ev.note?('📝 '+ev.note+'\n'):''}— CREATEZ`;
+}
+function gcalLink(ev){
+  const t=evDateTime(ev);
+  const dates=t.allDay?(t.s+'/'+t.e):(t.s+'/'+t.e);
+  const p=new URLSearchParams({action:'TEMPLATE',text:ev.title||'',dates:dates,
+    details:[ev.type?('Typ: '+ev.type):'',ev.partner?('Partner: '+ev.partner):'',ev.note||''].filter(Boolean).join('\n'),
+    location:ev.loc||''});
+  return 'https://calendar.google.com/calendar/render?'+p.toString();
+}
+let shareTarget=null;
+function openShare(ev){
+  shareTarget=ev;
+  document.getElementById('sharePreview').textContent=evText(ev).replace(/\n/g,' · ');
+  openSheet('shareSheet');
+}
+document.getElementById('shShare').onclick=async()=>{
+  const ev=shareTarget; if(!ev) return;
+  const text=evText(ev);
+  try{
+    if(navigator.canShare){
+      const file=new File([icsFor([ev])], (ev.title||'einsatz')+'.ics', {type:'text/calendar'});
+      if(navigator.canShare({files:[file]})){ await navigator.share({title:ev.title,text,files:[file]}); return; }
+    }
+    if(navigator.share){ await navigator.share({title:ev.title,text}); return; }
+    await navigator.clipboard.writeText(text); toast('In Zwischenablage kopiert');
+  }catch(e){ /* abgebrochen */ }
+};
+document.getElementById('shWa').onclick=()=>{ window.open('https://wa.me/?text='+encodeURIComponent(evText(shareTarget)),'_blank') };
+document.getElementById('shGcal').onclick=()=>{ window.open(gcalLink(shareTarget),'_blank') };
+document.getElementById('shIcs').onclick=()=>{ downloadFile((shareTarget.title||'einsatz').replace(/\s+/g,'_')+'.ics', icsFor([shareTarget]), 'text/calendar') };
+document.getElementById('shCopy').onclick=async()=>{ await navigator.clipboard.writeText(evText(shareTarget)); toast('Kopiert') };
+document.getElementById('shClose').onclick=()=>closeSheet('shareSheet');
+
+/* Tag teilen */
+document.getElementById('shareDay').onclick=async()=>{
+  const evs=eventsOn(selDate);
+  if(!evs.length){ toast('Keine Einsätze an diesem Tag'); return }
+  const text='📅 Einsätze '+fmtDate(selDate)+'\n\n'+evs.map(evText).join('\n\n');
+  try{
+    if(navigator.canShare){
+      const file=new File([icsFor(evs)],'einsaetze_'+selDate+'.ics',{type:'text/calendar'});
+      if(navigator.canShare({files:[file]})){ await navigator.share({title:'Einsätze '+selDate,text,files:[file]}); return; }
+    }
+    if(navigator.share){ await navigator.share({title:'Einsätze '+selDate,text}); return; }
+    await navigator.clipboard.writeText(text); toast('Kopiert');
+  }catch(e){}
+};
+
+/* ---------- Jobs list ---------- */
+let jobFilter='all';
+document.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{
+  jobFilter=b.dataset.filter;
+  document.querySelectorAll('[data-filter]').forEach(x=>x.classList.toggle('share',x===b));
+  renderJobs();
+});
+function renderJobs(){
+  const box=document.getElementById('jobsList'); box.innerHTML='';
+  const today=iso(new Date());
+  let list=[...events].sort((a,b)=>(a.date+a.start).localeCompare(b.date+b.start));
+  if(jobFilter==='upcoming') list=list.filter(e=>e.date>=today);
+  if(jobFilter==='past') list=list.filter(e=>e.date<today);
+  if(!list.length){ box.innerHTML='<div class="empty">Keine Einsätze.</div>'; return }
+  let lastDate='';
+  list.forEach(ev=>{
+    if(ev.date!==lastDate){ const h=document.createElement('div'); h.className='muted'; h.style.cssText='font-size:12px;font-weight:700;margin:14px 2px 6px';h.textContent=fmtDate(ev.date); box.appendChild(h); lastDate=ev.date; }
+    box.appendChild(eventCard(ev));
+  });
+}
+
+/* ---------- Partners ---------- */
+let editingP=null;
+function renderPartners(){
+  const box=document.getElementById('partnersList'); box.innerHTML='';
+  if(!partners.length){ box.innerHTML='<div class="empty">Noch keine Partner.</div>'; }
+  partners.forEach(p=>{
+    const el=document.createElement('div'); el.className='card'; el.style.marginBottom='10px';
+    el.innerHTML=`<div class="row"><div style="flex:1"><b>${esc(p.name)}</b>
+      ${p.phone?`<div class="meta muted" style="font-size:13px">📞 ${esc(p.phone)}</div>`:''}
+      ${p.note?`<div class="meta muted" style="font-size:13px">${esc(p.note)}</div>`:''}</div>
+      ${p.phone?`<a class="chip" href="tel:${esc(p.phone)}">📞</a>`:''}
+      <button class="chip" data-edit>✏️</button></div>`;
+    el.querySelector('[data-edit]').onclick=()=>openPartner(p);
+    box.appendChild(el);
+  });
+}
+function openPartner(p){
+  editingP=p||null;
+  document.getElementById('pSheetTitle').textContent=p?'Partner bearbeiten':'Neuer Partner';
+  document.getElementById('pName').value=p?.name||'';
+  document.getElementById('pPhone').value=p?.phone||'';
+  document.getElementById('pNote').value=p?.note||'';
+  document.getElementById('pDelete').classList.toggle('hidden',!p);
+  openSheet('partnerSheet');
+}
+document.getElementById('addPartner').onclick=()=>openPartner(null);
+document.getElementById('pSave').onclick=()=>{
+  const name=document.getElementById('pName').value.trim(); if(!name){toast('Name fehlt');return}
+  const data={name,phone:document.getElementById('pPhone').value.trim(),note:document.getElementById('pNote').value.trim()};
+  if(editingP) Object.assign(editingP,data); else { data.id=uid(); partners.push(data); }
+  save(); closeSheet('partnerSheet'); renderPartners(); toast('Gespeichert');
+};
+document.getElementById('pDelete').onclick=()=>{
+  if(editingP&&confirm('Partner löschen?')){ partners=partners.filter(x=>x!==editingP); save(); closeSheet('partnerSheet'); renderPartners(); }
+};
+document.getElementById('pClose').onclick=()=>closeSheet('partnerSheet');
+
+/* ---------- Admin ---------- */
+function renderStats(){
+  const today=iso(new Date());
+  document.getElementById('stEvents').textContent=events.length;
+  document.getElementById('stUpcoming').textContent=events.filter(e=>e.date>=today).length;
+  document.getElementById('stPartners').textContent=partners.length;
+}
+document.getElementById('exportIcs').onclick=()=>{
+  if(!events.length){toast('Keine Einsätze');return}
+  downloadFile('createz_kalender.ics', icsFor(events), 'text/calendar'); toast('Exportiert');
+};
+document.getElementById('shareAll').onclick=async()=>{
+  if(!events.length){toast('Keine Einsätze');return}
+  try{
+    const file=new File([icsFor(events)],'createz_kalender.ics',{type:'text/calendar'});
+    if(navigator.canShare&&navigator.canShare({files:[file]})){ await navigator.share({title:'CREATEZ Kalender',files:[file]}); return; }
+    downloadFile('createz_kalender.ics', icsFor(events),'text/calendar');
+  }catch(e){}
+};
+document.getElementById('importIcs').onclick=()=>document.getElementById('icsFile').click();
+document.getElementById('icsFile').onchange=e=>{
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader(); r.onload=()=>{ importIcs(r.result); e.target.value=''; }; r.readAsText(f);
+};
+function importIcs(text){
+  const blocks=text.split('BEGIN:VEVENT').slice(1); let n=0;
+  blocks.forEach(b=>{
+    const get=re=>{const m=b.match(re);return m?m[1].trim():''};
+    const sum=get(/SUMMARY:(.*)/); if(!sum) return;
+    const dtRaw=get(/DTSTART[^:]*:(.*)/);
+    let date='',start='';
+    if(/^\d{8}$/.test(dtRaw)){ date=dtRaw.replace(/(\d{4})(\d{2})(\d{2})/,'$1-$2-$3'); }
+    else { const m=dtRaw.match(/(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})/); if(m){date=`${m[1]}-${m[2]}-${m[3]}`;start=`${m[4]}:${m[5]}`;} }
+    if(!date) return;
+    events.push({id:uid(),title:sum.replace(/\\,/g,',').replace(/\\n/g,' '),date,start,end:'',type:'Termin',loc:get(/LOCATION:(.*)/).replace(/\\,/g,','),partner:'',note:get(/DESCRIPTION:(.*)/).replace(/\\n/g,' ').replace(/\\,/g,','),color:COLORS[0]});
+    n++;
+  });
+  save(); renderAll(); toast(n+' Termine importiert');
+}
+document.getElementById('exportJson').onclick=()=>downloadFile('createz_backup.json', JSON.stringify({events,partners},null,2),'application/json');
+document.getElementById('importJson').onclick=()=>document.getElementById('jsonFile').click();
+document.getElementById('jsonFile').onchange=e=>{
+  const f=e.target.files[0]; if(!f)return; const r=new FileReader();
+  r.onload=()=>{ try{ const d=JSON.parse(r.result); if(d.events)events=d.events; if(d.partners)partners=d.partners; save(); renderAll(); toast('Backup importiert'); }catch(x){ toast('Ungültige Datei'); } e.target.value=''; };
+  r.readAsText(f);
+};
+document.getElementById('changePin').onclick=()=>{ pinMode='set1'; pinBuffer='';
+  document.getElementById('app').classList.add('hidden'); document.getElementById('login').classList.remove('hidden');
+  document.getElementById('loginSub').textContent='Superadmin-Zugang · Neue PIN'; document.getElementById('pinHint').classList.add('hidden'); renderDots(); };
+document.getElementById('logout').onclick=lock;
+
+/* ---------- Render all ---------- */
+function renderAll(){ renderCalendar(); renderDay(); renderStats(); refreshPartnerOptions(); }
+
+/* ---------- PWA / install ---------- */
+if('serviceWorker' in navigator){ window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{})); }
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault(); deferredPrompt=e;
+  const h=document.getElementById('installHint'); h.classList.remove('hidden');
+  h.innerHTML='📲 <b>Als App installieren</b> – tippen zum Hinzufügen zum Startbildschirm.';
+  h.style.cursor='pointer';
+  h.onclick=async()=>{ if(deferredPrompt){ deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt=null; h.classList.add('hidden'); } };
+});
+// iOS hint
+(function(){
+  const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
+  const standalone=window.navigator.standalone || window.matchMedia('(display-mode: standalone)').matches;
+  if(isIOS && !standalone){
+    const h=document.getElementById('installHint'); h.classList.remove('hidden');
+    h.innerHTML='📲 <b>App installieren:</b> unten auf „Teilen“ → „Zum Home-Bildschirm“.';
+  }
+})();
+
+/* ---------- Boot ---------- */
+renderKeys(); renderDots();
+document.getElementById('pinHint').classList.toggle('hidden', !!DB.get('pinHash',null));
+</script>
+</body>
+</html>
