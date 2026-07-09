@@ -1,0 +1,27 @@
+{
+  "name": "CREATEZ Geschäftsführer Cockpit",
+  "short_name": "CREATEZ",
+  "description": "Geschäftsführer-Cockpit der CREATEZ GmbH: Einsatz-Kalender, Aufgaben, Finanzen und Notizen – mobil und offline.",
+  "start_url": "./app.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#111418",
+  "theme_color": "#111418",
+  "lang": "de",
+  "categories": ["business", "productivity"],
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "./icon-maskable.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
+    }
+  ]
+}
