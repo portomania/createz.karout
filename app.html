@@ -625,7 +625,7 @@
 "use strict";
 /* ---------- Storage ---------- */
 const DB = {
-  get(k, d){ try{ return JSON.parse(localStorage.getItem('cz_'+k)) ?? d }catch(e){ return d } },
+  get(k, d){ try{ return JSON.parse(localStorage.getItem('cz_'+k)) ?? d }catch{ return d } },
   set(k, v){ localStorage.setItem('cz_'+k, JSON.stringify(v)) }
 };
 let events   = DB.get('events', []);
@@ -651,7 +651,10 @@ const PRIOW  = {hoch:0,mittel:1,niedrig:2};
 const TYPEL  = {einnahme:'Einnahme',ausgabe:'Ausgabe',rechnung:'Rechnung'};
 const QSTAT  = {offen:'Offen',angenommen:'Angenommen',abgelehnt:'Abgelehnt'};
 
-function uid(){ return 'x'+Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-3) }
+function uid(){
+  const a=new Uint32Array(2); crypto.getRandomValues(a);
+  return 'x'+a[0].toString(36)+a[1].toString(36)+Date.now().toString(36).slice(-3);
+}
 function save(){ DB.set('events',events); DB.set('partners',partners); DB.set('tasks',tasks); DB.set('fin',fin); DB.set('notes',notes); DB.set('customers',customers); DB.set('quotes',quotes); DB.set('company',company) }
 function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2200) }
 const pad=n=>String(n).padStart(2,'0');
@@ -709,7 +712,10 @@ async function handlePin(){
   if(pinMode==='login'){
     const h=await hash(entered);
     const ok = stored ? h===stored : entered==='1234';
-    if(ok){ if(!stored) DB.set('pinHash', await hash('1234')); enterApp(); }
+    if(ok){
+      if(!stored){ DB.set('pinHash', await hash('1234')); }
+      enterApp();
+    }
     else { toast('Falsche PIN'); navigator.vibrate&&navigator.vibrate(200); renderDots(); }
   } else if(pinMode==='set1'){
     tmpPin=entered; pinMode='set2';
@@ -782,14 +788,22 @@ function nextEvent(){
 function relLabel(ev){
   const today=iso(new Date());
   const dLabel = ev.date===today ? 'Heute' : fmtDate(ev.date);
-  const t = ev.start ? ' · '+ev.start+(ev.end?'–'+ev.end:'')+' Uhr' : '';
+  let t='';
+  if(ev.start){
+    const endPart=ev.end?'–'+ev.end:'';
+    t=' · '+ev.start+endPart+' Uhr';
+  }
   let rel='';
   if(ev.start||ev.date>today){
     const target=new Date(ev.date+'T'+(ev.start||'00:00'));
     const diff=target-new Date();
     if(diff>0){
       const m=Math.round(diff/60000);
-      rel=' · in '+(m<60 ? m+' Min' : m<2880 ? Math.floor(m/60)+' Std '+(m%60)+' Min' : Math.round(m/1440)+' Tagen');
+      let relTxt;
+      if(m<60) relTxt=m+' Min';
+      else if(m<2880) relTxt=Math.floor(m/60)+' Std '+(m%60)+' Min';
+      else relTxt=Math.round(m/1440)+' Tagen';
+      rel=' · in '+relTxt;
     }
   }
   return dLabel+t+rel;
@@ -798,7 +812,10 @@ function renderHome(){
   const now=new Date();
   const h=now.getHours();
   const name=DB.get('name','Rui');
-  document.getElementById('greetTitle').textContent=(h<11?'Guten Morgen':h<18?'Guten Tag':'Guten Abend')+', '+name+'!';
+  let greet='Guten Abend';
+  if(h<11) greet='Guten Morgen';
+  else if(h<18) greet='Guten Tag';
+  document.getElementById('greetTitle').textContent=greet+', '+name+'!';
   document.getElementById('greetDate').textContent=WDLONG[now.getDay()]+', '+now.getDate()+'. '+MONTHS[now.getMonth()]+' '+now.getFullYear();
 
   const ne=nextEvent(), nc=document.getElementById('nextEvCard');
@@ -850,7 +867,7 @@ document.getElementById('shareBriefing').onclick=async()=>{
   try{
     if(navigator.share){ await navigator.share({title:'Tagesbriefing',text}); return }
     await navigator.clipboard.writeText(text); toast('Briefing kopiert');
-  }catch(e){}
+  }catch(err){ if(err&&err.name!=='AbortError') toast('Teilen nicht möglich'); }
 };
 
 /* Quick actions */
@@ -919,7 +936,11 @@ function renderDay(){
 }
 function eventCard(ev){
   const el=document.createElement('div'); el.className='event';
-  const time = ev.start ? (ev.start + (ev.end?('–'+ev.end):'')) : 'ganztägig';
+  let time='ganztägig';
+  if(ev.start){
+    const endPart=ev.end?'–'+ev.end:'';
+    time=ev.start+endPart;
+  }
   el.innerHTML=`
     <div class="bar" style="background:${ev.color||'#2f80ff'}"></div>
     <div class="body">
@@ -1002,11 +1023,13 @@ function taskRow(t){
   const el=document.createElement('div'); el.className='task'+(t.done?' done':'');
   const today=iso(new Date());
   const overdue=!t.done&&t.due&&t.due<today;
+  const oduePrefix=overdue?'⚠️ überfällig · ':'';
+  const dueTxt=t.due?(oduePrefix+'fällig '+fmtShort(t.due)):'ohne Frist';
   el.innerHTML=`<button class="cb">✓</button>
     <div class="tt">
       <div class="t">${esc(t.title)}</div>
       <div class="meta" style="font-size:12px;${overdue?'color:var(--danger)':''}">
-        ${t.due?((overdue?'⚠️ überfällig · ':'')+'fällig '+fmtShort(t.due)):'ohne Frist'}
+        ${dueTxt}
         · <span style="color:${PRIOC[t.prio]||PRIOC.mittel}">●</span> ${esc(t.prio||'mittel')}
       </div>
     </div>
@@ -1060,10 +1083,16 @@ function finRow(f){
   const el=document.createElement('div'); el.className='task';
   const isOut=f.type==='ausgabe';
   const isOpenInv=f.type==='rechnung'&&!f.paid;
-  const cls=isOut?'minus':(isOpenInv?'open':'plus');
-  const badge=f.type==='rechnung'
-    ? `<button class="chip${f.paid?'':' share'}" data-paid style="${f.paid?'':'background:var(--warn);border-color:var(--warn);color:#161616'}">${f.paid?'BEZAHLT':'OFFEN'}</button>`
-    : '';
+  let cls='plus';
+  if(isOut) cls='minus';
+  else if(isOpenInv) cls='open';
+  let badge='';
+  if(f.type==='rechnung'){
+    const paidCls=f.paid?'':' share';
+    const paidStyle=f.paid?'':'background:var(--warn);border-color:var(--warn);color:#161616';
+    const paidTxt=f.paid?'BEZAHLT':'OFFEN';
+    badge=`<button class="chip${paidCls}" data-paid style="${paidStyle}">${paidTxt}</button>`;
+  }
   el.innerHTML=`<div class="tt">
       <div class="t">${esc(f.label)}</div>
       <div class="meta" style="font-size:12px">${fmtShort(f.date)} · ${TYPEL[f.type]||f.type}</div>
@@ -1071,7 +1100,10 @@ function finRow(f){
     ${badge}
     <div class="amount ${cls}">${isOut?'−':'+'} ${eur(f.amount)}</div>`;
   el.style.cursor='pointer';
-  el.onclick=e=>{ if(e.target.closest('[data-paid]')) return; openFin(f); };
+  el.onclick=e=>{
+    if(e.target.closest('[data-paid]')){ return; }
+    openFin(f);
+  };
   const pb=el.querySelector('[data-paid]');
   if(pb) pb.onclick=e=>{ e.stopPropagation(); f.paid=!f.paid; save(); renderFin(); renderHome(); toast(f.paid?'Als bezahlt markiert ✅':'Als offen markiert'); };
   return el;
@@ -1125,7 +1157,7 @@ function renderChart(){
   um.textContent=(sal<0?'− ':'')+eurShort(Math.abs(sal)); um.style.color=sal<0?'var(--danger)':'var(--ok)';
 
   const max=Math.max(1,...data.map(d=>Math.max(d.ein,d.aus)));
-  const W=320,H=170,pad=24,bw=W/6,gap=6,barW=(bw-gap*2)/2, base=H-22;
+  const W=320,H=170,bw=W/6,gap=6,barW=(bw-gap*2)/2, base=H-22;
   let bars='';
   data.forEach((d,i)=>{
     const x0=i*bw;
@@ -1325,8 +1357,12 @@ function printQuote(q){
       <td class="num">${eur(it.price)}</td><td class="num">${eur(line)}</td></tr>`;
   }).join('');
   const cust=customerByName(q.customer);
-  const custBlock=cust?`<b>${esc(cust.name)}</b><br>${cust.contact?esc(cust.contact)+'<br>':''}${cust.addr?esc(cust.addr).replace(/\n/g,'<br>'):''}`
-    :`<b>${esc(q.customer||'')}</b>`;
+  let custBlock=`<b>${esc(q.customer||'')}</b>`;
+  if(cust){
+    const contactLine=cust.contact?esc(cust.contact)+'<br>':'';
+    const addrLines=cust.addr?esc(cust.addr).replace(/\n/g,'<br>'):'';
+    custBlock=`<b>${esc(cust.name)}</b><br>${contactLine}${addrLines}`;
+  }
   document.getElementById('printArea').innerHTML=`
     <div class="doc">
       <div class="hd">
@@ -1381,7 +1417,7 @@ document.getElementById('fiSave').onclick=()=>{
   const label=document.getElementById('fiLabel').value.trim();
   const amount=parseAmount(document.getElementById('fiAmount').value);
   if(!label){ toast('Bitte Bezeichnung eingeben'); return }
-  if(!(amount>0)){ toast('Bitte gültigen Betrag eingeben'); return }
+  if(Number.isNaN(amount)||amount<=0){ toast('Bitte gültigen Betrag eingeben'); return }
   const type=document.getElementById('fiType').value;
   const data={type,label,amount:Math.round(amount*100)/100,
     date:document.getElementById('fiDate').value||iso(new Date()),
@@ -1399,8 +1435,9 @@ document.getElementById('exportCsv').onclick=()=>{
   const q=s=>'"'+String(s).replace(/"/g,'""')+'"'; // CSV-Quoting für Excel
   const rows=[['Datum','Typ','Bezeichnung','Betrag (EUR)','Status']];
   [...fin].sort((a,b)=>(a.date||'').localeCompare(b.date||'')).forEach(f=>{
-    rows.push([f.date,TYPEL[f.type]||f.type,q(f.label),String(f.amount).replace('.',','),
-      f.type==='rechnung'?(f.paid?'bezahlt':'offen'):'']);
+    let status='';
+    if(f.type==='rechnung') status=f.paid?'bezahlt':'offen';
+    rows.push([f.date,TYPEL[f.type]||f.type,q(f.label),String(f.amount).replace('.',','),status]);
   });
   downloadFile('createz_finanzen.csv','﻿'+rows.map(r=>r.join(';')).join('\r\n'),'text/csv;charset=utf-8');
   toast('CSV exportiert');
@@ -1423,7 +1460,7 @@ function renderNotes(){
       </div>`;
     el.querySelector('[data-nshare]').onclick=async()=>{
       try{ if(navigator.share){ await navigator.share({text:n.text}); return }
-        await navigator.clipboard.writeText(n.text); toast('Kopiert'); }catch(e){}
+        await navigator.clipboard.writeText(n.text); toast('Kopiert'); }catch(err){ if(err&&err.name!=='AbortError') toast('Teilen nicht möglich'); }
     };
     el.querySelector('[data-ndel]').onclick=()=>{
       if(confirm('Notiz löschen?')){ notes=notes.filter(x=>x!==n); save(); renderNotes(); }
@@ -1445,7 +1482,7 @@ document.getElementById('nClose').onclick=()=>closeSheet('noteSheet');
 function openSheet(id){
   document.getElementById(id).classList.add('open');
   // Android-Zurück-Geste soll das Sheet schließen, nicht die App beenden
-  if(!(history.state&&history.state.czSheet)){ try{ history.pushState({czSheet:1},''); }catch(e){} }
+  if(!(history.state&&history.state.czSheet)){ try{ history.pushState({czSheet:1},''); }catch{ /* ältere Browser ohne History-API */ } }
 }
 function closeSheet(id){ document.getElementById(id).classList.remove('open') }
 window.addEventListener('popstate',()=>{ document.querySelectorAll('.sheet-bg.open').forEach(x=>x.classList.remove('open')) });
@@ -1492,7 +1529,11 @@ function downloadFile(name, content, type){
   setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 function evText(ev){
-  const t=ev.start?(ev.start+(ev.end?('–'+ev.end):'')+' Uhr'):'ganztägig';
+  let t='ganztägig';
+  if(ev.start){
+    const endPart=ev.end?'–'+ev.end:'';
+    t=ev.start+endPart+' Uhr';
+  }
   return `📦 ${ev.title}\n📅 ${fmtDate(ev.date)} · ${t}\n${ev.type?('🏷️ '+ev.type+'\n'):''}${ev.loc?('📍 '+ev.loc+'\n'):''}${ev.partner?('👤 '+ev.partner+'\n'):''}${ev.note?('📝 '+ev.note+'\n'):''}— CREATEZ GmbH`;
 }
 function gcalLink(ev){
@@ -1518,7 +1559,7 @@ document.getElementById('shShare').onclick=async()=>{
     }
     if(navigator.share){ await navigator.share({title:ev.title,text}); return; }
     await navigator.clipboard.writeText(text); toast('In Zwischenablage kopiert');
-  }catch(e){ /* abgebrochen */ }
+  }catch(err){ if(err&&err.name!=='AbortError') toast('Teilen nicht möglich'); }
 };
 document.getElementById('shWa').onclick=()=>{ window.open('https://wa.me/?text='+encodeURIComponent(evText(shareTarget)),'_blank') };
 document.getElementById('shGcal').onclick=()=>{ window.open(gcalLink(shareTarget),'_blank') };
@@ -1538,7 +1579,7 @@ document.getElementById('shareDay').onclick=async()=>{
     }
     if(navigator.share){ await navigator.share({title:'Einsätze '+selDate,text}); return; }
     await navigator.clipboard.writeText(text); toast('Kopiert');
-  }catch(e){}
+  }catch(err){ if(err&&err.name!=='AbortError') toast('Teilen nicht möglich'); }
 };
 
 /* ---------- Partners ---------- */
@@ -1593,7 +1634,7 @@ document.getElementById('shareAll').onclick=async()=>{
     const file=new File([icsFor(events)],'createz_kalender.ics',{type:'text/calendar'});
     if(navigator.canShare&&navigator.canShare({files:[file]})){ await navigator.share({title:'CREATEZ Kalender',files:[file]}); return; }
     downloadFile('createz_kalender.ics', icsFor(events),'text/calendar');
-  }catch(e){}
+  }catch(err){ if(err&&err.name!=='AbortError') toast('Teilen nicht möglich'); }
 };
 document.getElementById('importIcs').onclick=()=>document.getElementById('icsFile').click();
 document.getElementById('icsFile').onchange=e=>{
@@ -1633,17 +1674,23 @@ function importIcs(text){
 document.getElementById('exportJson').onclick=()=>downloadFile('createz_backup.json', JSON.stringify({events,partners,tasks,fin,notes,customers,quotes,company},null,2),'application/json');
 document.getElementById('importJson').onclick=()=>document.getElementById('jsonFile').click();
 document.getElementById('jsonFile').onchange=e=>{
-  const f=e.target.files[0]; if(!f)return; const r=new FileReader();
+  const f=e.target.files[0];
+  if(!f) return;
+  const r=new FileReader();
   r.onload=()=>{ try{
       const d=JSON.parse(r.result);
       const arr=x=>Array.isArray(x);
       if(!(arr(d.events)||arr(d.partners)||arr(d.tasks)||arr(d.fin)||arr(d.notes)||arr(d.customers)||arr(d.quotes))) throw new Error('leer');
-      if(arr(d.events))events=d.events; if(arr(d.partners))partners=d.partners;
-      if(arr(d.tasks))tasks=d.tasks; if(arr(d.fin))fin=d.fin; if(arr(d.notes))notes=d.notes;
-      if(arr(d.customers))customers=d.customers; if(arr(d.quotes))quotes=d.quotes;
+      if(arr(d.events)) events=d.events;
+      if(arr(d.partners)) partners=d.partners;
+      if(arr(d.tasks)) tasks=d.tasks;
+      if(arr(d.fin)) fin=d.fin;
+      if(arr(d.notes)) notes=d.notes;
+      if(arr(d.customers)) customers=d.customers;
+      if(arr(d.quotes)) quotes=d.quotes;
       if(d.company&&typeof d.company==='object') company=d.company;
       renderAll(); save(); toast('Backup importiert'); // erst rendern, dann speichern
-    }catch(x){ toast('Ungültige Datei'); } e.target.value=''; };
+    }catch{ toast('Ungültige Datei'); } e.target.value=''; };
   r.readAsText(f);
 };
 document.getElementById('changePin').onclick=()=>{ pinMode='set1'; pinBuffer='';
