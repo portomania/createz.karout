@@ -365,7 +365,7 @@
     <label class="f">Ort / Route</label>
     <input class="input" id="fLoc" placeholder="Abhol- / Zielort">
     <label class="f">Partner / Fahrer</label>
-    <input class="input" id="fPartner" placeholder="z.B. Kahrout Transporte" list="partnerOptions">
+    <input class="input" id="fPartner" placeholder="z.B. Fahrer / Subunternehmer" list="partnerOptions">
     <datalist id="partnerOptions"></datalist>
     <label class="f">Notiz</label>
     <textarea class="input" id="fNote" placeholder="Details, Kontakt, Ladung …"></textarea>
@@ -474,7 +474,7 @@ const DB = {
   set(k, v){ localStorage.setItem('cz_'+k, JSON.stringify(v)) }
 };
 let events   = DB.get('events', []);
-let partners = DB.get('partners', [{id:uid(),name:'Kahrout Transporte',phone:'',note:'Flexibler Einsatzpartner'}]);
+let partners = DB.get('partners', []);
 let tasks    = DB.get('tasks', []);
 let fin      = DB.get('fin', []);
 let notes    = DB.get('notes', []);
