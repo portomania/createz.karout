@@ -138,7 +138,7 @@
   .sheet{background:var(--surface);width:100%;max-width:560px;border-radius:22px 22px 0 0;padding:8px 16px calc(20px + var(--safe-bottom));max-height:92dvh;overflow-y:auto;animation:up .22s ease}
   @keyframes up{from{transform:translateY(30px);opacity:.5}to{transform:none;opacity:1}}
   .grab{width:42px;height:5px;border-radius:3px;background:var(--line);margin:8px auto 14px}
-  label.f{display:block;font-size:12px;color:var(--muted);font-weight:700;margin:12px 2px 6px;text-transform:uppercase;letter-spacing:.4px}
+  .f{display:block;font-size:12px;color:var(--muted);font-weight:700;margin:12px 2px 6px;text-transform:uppercase;letter-spacing:.4px}
   .input,select.input,textarea.input{width:100%;background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:13px;color:var(--text)}
   textarea.input{min-height:80px;resize:vertical}
   .colors{display:flex;gap:10px;margin-top:6px}
@@ -355,19 +355,19 @@
     <h2 class="section">Firmendaten (für Angebote)</h2>
     <div class="card">
       <div class="muted" style="font-size:13px;margin-bottom:10px">Erscheinen im Briefkopf der Angebots-PDF.</div>
-      <label class="f" style="margin-top:0">Firmenname</label>
+      <label class="f" for="coName" style="margin-top:0">Firmenname</label>
       <input class="input" id="coName" placeholder="CREATEZ GmbH">
-      <label class="f">Anschrift</label>
+      <label class="f" for="coAddr">Anschrift</label>
       <textarea class="input" id="coAddr" placeholder="Musterstraße 1&#10;12345 Musterstadt" style="min-height:56px"></textarea>
       <div class="grid2">
-        <div><label class="f">Telefon</label><input class="input" id="coPhone" placeholder="+49 …"></div>
-        <div><label class="f">E-Mail</label><input class="input" id="coMail" placeholder="info@createz.de"></div>
+        <div><label class="f" for="coPhone">Telefon</label><input class="input" id="coPhone" placeholder="+49 …"></div>
+        <div><label class="f" for="coMail">E-Mail</label><input class="input" id="coMail" placeholder="info@createz.de"></div>
       </div>
       <div class="grid2">
-        <div><label class="f">USt-IdNr.</label><input class="input" id="coTax" placeholder="DE…"></div>
-        <div><label class="f">MwSt-Satz %</label><input class="input" id="coVat" inputmode="decimal" placeholder="19"></div>
+        <div><label class="f" for="coTax">USt-IdNr.</label><input class="input" id="coTax" placeholder="DE…"></div>
+        <div><label class="f" for="coVat">MwSt-Satz %</label><input class="input" id="coVat" inputmode="decimal" placeholder="19"></div>
       </div>
-      <label class="f">IBAN / Bank</label>
+      <label class="f" for="coBank">IBAN / Bank</label>
       <input class="input" id="coBank" placeholder="DE.. · Bankname">
       <button class="btn ok block" id="coSave" style="margin-top:14px">Firmendaten speichern</button>
     </div>
@@ -391,7 +391,7 @@
 
     <h2 class="section">Einstellungen</h2>
     <div class="card">
-      <label class="f" style="margin-top:0">Dein Name (Begrüßung)</label>
+      <label class="f" for="meName" style="margin-top:0">Dein Name (Begrüßung)</label>
       <input class="input" id="meName" placeholder="Rui">
       <button class="btn ghost block" id="fabSide" style="margin-top:12px">🖐 Plus-Button: Seite wechseln (Einhand-Modus)</button>
     </div>
@@ -450,28 +450,28 @@
   <div class="sheet">
     <div class="grab"></div>
     <div class="sheet-title" id="sheetTitle">Neuer Einsatz</div>
-    <label class="f">Titel</label>
+    <label class="f" for="fTitle">Titel</label>
     <input class="input" id="fTitle" placeholder="z.B. Kurierfahrt München → Augsburg">
     <div class="grid2">
-      <div><label class="f">Datum</label><input class="input" type="date" id="fDate"></div>
-      <div><label class="f">Typ</label>
+      <div><label class="f" for="fDate">Datum</label><input class="input" type="date" id="fDate"></div>
+      <div><label class="f" for="fType">Typ</label>
         <select class="input" id="fType">
           <option>Transport</option><option>Kurier</option><option>Termin</option><option>Bereitschaft</option>
         </select>
       </div>
     </div>
     <div class="grid2">
-      <div><label class="f">Von</label><input class="input" type="time" id="fStart"></div>
-      <div><label class="f">Bis</label><input class="input" type="time" id="fEnd"></div>
+      <div><label class="f" for="fStart">Von</label><input class="input" type="time" id="fStart"></div>
+      <div><label class="f" for="fEnd">Bis</label><input class="input" type="time" id="fEnd"></div>
     </div>
-    <label class="f">Ort / Route</label>
+    <label class="f" for="fLoc">Ort / Route</label>
     <input class="input" id="fLoc" placeholder="Abhol- / Zielort">
-    <label class="f">Partner / Fahrer</label>
+    <label class="f" for="fPartner">Partner / Fahrer</label>
     <input class="input" id="fPartner" placeholder="z.B. Fahrer / Subunternehmer" list="partnerOptions">
     <datalist id="partnerOptions"></datalist>
-    <label class="f">Notiz</label>
+    <label class="f" for="fNote">Notiz</label>
     <textarea class="input" id="fNote" placeholder="Details, Kontakt, Ladung …"></textarea>
-    <label class="f">Farbe</label>
+    <div class="f">Farbe</div>
     <div class="colors" id="colors"></div>
     <button class="btn ok block" id="saveEvent" style="margin-top:20px">Speichern</button>
     <button class="btn danger block hidden" id="deleteEvent" style="margin-top:10px">Löschen</button>
@@ -484,11 +484,11 @@
   <div class="sheet">
     <div class="grab"></div>
     <div class="sheet-title" id="tSheetTitle">Neue Aufgabe</div>
-    <label class="f">Aufgabe</label>
+    <label class="f" for="tTitle">Aufgabe</label>
     <input class="input" id="tTitle" placeholder="z.B. Angebot an Kunde senden">
     <div class="grid2">
-      <div><label class="f">Fällig am</label><input class="input" type="date" id="tDue"></div>
-      <div><label class="f">Priorität</label>
+      <div><label class="f" for="tDue">Fällig am</label><input class="input" type="date" id="tDue"></div>
+      <div><label class="f" for="tPrio">Priorität</label>
         <select class="input" id="tPrio"><option value="hoch">🔴 Hoch</option><option value="mittel" selected>🟡 Mittel</option><option value="niedrig">🟢 Niedrig</option></select>
       </div>
     </div>
@@ -503,20 +503,20 @@
   <div class="sheet">
     <div class="grab"></div>
     <div class="sheet-title" id="fiSheetTitle">Neue Buchung</div>
-    <label class="f">Typ</label>
+    <label class="f" for="fiType">Typ</label>
     <select class="input" id="fiType">
       <option value="einnahme">💰 Einnahme</option>
       <option value="ausgabe">💸 Ausgabe</option>
       <option value="rechnung">🧾 Rechnung (an Kunde)</option>
     </select>
-    <label class="f">Bezeichnung</label>
+    <label class="f" for="fiLabel">Bezeichnung</label>
     <input class="input" id="fiLabel" placeholder="z.B. Transport Meier GmbH">
     <div class="grid2">
-      <div><label class="f">Betrag (€)</label><input class="input" id="fiAmount" inputmode="decimal" placeholder="z.B. 250,00"></div>
-      <div><label class="f">Datum</label><input class="input" type="date" id="fiDate"></div>
+      <div><label class="f" for="fiAmount">Betrag (€)</label><input class="input" id="fiAmount" inputmode="decimal" placeholder="z.B. 250,00"></div>
+      <div><label class="f" for="fiDate">Datum</label><input class="input" type="date" id="fiDate"></div>
     </div>
     <div id="fiStatusWrap">
-      <label class="f">Status</label>
+      <label class="f" for="fiStatus">Status</label>
       <select class="input" id="fiStatus"><option value="offen">🟠 Offen</option><option value="bezahlt">✅ Bezahlt</option></select>
     </div>
     <button class="btn ok block" id="fiSave" style="margin-top:20px">Speichern</button>
@@ -530,7 +530,7 @@
   <div class="sheet">
     <div class="grab"></div>
     <div class="sheet-title">Notiz</div>
-    <label class="f">Text</label>
+    <label class="f" for="nText">Text</label>
     <textarea class="input" id="nText" placeholder="Kurz festhalten …" style="min-height:120px"></textarea>
     <button class="btn ok block" id="nSave" style="margin-top:18px">Speichern</button>
     <button class="btn ghost block" id="nClose" style="margin-top:10px">Abbrechen</button>
@@ -557,9 +557,9 @@
   <div class="sheet">
     <div class="grab"></div>
     <div class="sheet-title" id="pSheetTitle">Partner</div>
-    <label class="f">Name</label><input class="input" id="pName" placeholder="Firma / Fahrer">
-    <label class="f">Telefon</label><input class="input" id="pPhone" placeholder="+49 …" type="tel">
-    <label class="f">Notiz</label><input class="input" id="pNote" placeholder="Fahrzeug, Verfügbarkeit …">
+    <label class="f" for="pName">Name</label><input class="input" id="pName" placeholder="Firma / Fahrer">
+    <label class="f" for="pPhone">Telefon</label><input class="input" id="pPhone" placeholder="+49 …" type="tel">
+    <label class="f" for="pNote">Notiz</label><input class="input" id="pNote" placeholder="Fahrzeug, Verfügbarkeit …">
     <button class="btn ok block" id="pSave" style="margin-top:18px">Speichern</button>
     <button class="btn danger block hidden" id="pDelete" style="margin-top:10px">Löschen</button>
     <button class="btn ghost block" id="pClose" style="margin-top:10px">Abbrechen</button>
@@ -571,15 +571,15 @@
   <div class="sheet">
     <div class="grab"></div>
     <div class="sheet-title" id="cuSheetTitle">Kunde</div>
-    <label class="f">Firma / Name</label><input class="input" id="cuName" placeholder="z.B. Meier GmbH">
-    <label class="f">Ansprechpartner</label><input class="input" id="cuContact" placeholder="Vor- und Nachname">
+    <label class="f" for="cuName">Firma / Name</label><input class="input" id="cuName" placeholder="z.B. Meier GmbH">
+    <label class="f" for="cuContact">Ansprechpartner</label><input class="input" id="cuContact" placeholder="Vor- und Nachname">
     <div class="grid2">
-      <div><label class="f">Telefon</label><input class="input" id="cuPhone" type="tel" placeholder="+49 …"></div>
-      <div><label class="f">E-Mail</label><input class="input" id="cuMail" placeholder="kunde@…"></div>
+      <div><label class="f" for="cuPhone">Telefon</label><input class="input" id="cuPhone" type="tel" placeholder="+49 …"></div>
+      <div><label class="f" for="cuMail">E-Mail</label><input class="input" id="cuMail" placeholder="kunde@…"></div>
     </div>
-    <label class="f">Anschrift</label>
+    <label class="f" for="cuAddr">Anschrift</label>
     <textarea class="input" id="cuAddr" placeholder="Straße&#10;PLZ Ort" style="min-height:56px"></textarea>
-    <label class="f">Notiz</label><input class="input" id="cuNote" placeholder="Konditionen, Hinweise …">
+    <label class="f" for="cuNote">Notiz</label><input class="input" id="cuNote" placeholder="Konditionen, Hinweise …">
     <button class="btn ok block" id="cuSave" style="margin-top:16px">Speichern</button>
     <button class="btn danger block hidden" id="cuDelete" style="margin-top:10px">Löschen</button>
     <button class="btn ghost block" id="cuClose" style="margin-top:10px">Abbrechen</button>
@@ -591,26 +591,26 @@
   <div class="sheet">
     <div class="grab"></div>
     <div class="sheet-title" id="quSheetTitle">Neues Angebot</div>
-    <label class="f">Kunde</label>
+    <label class="f" for="quCustomer">Kunde</label>
     <input class="input" id="quCustomer" placeholder="Kunde wählen/eingeben" list="customerOptions">
     <datalist id="customerOptions"></datalist>
     <div class="grid2">
-      <div><label class="f">Datum</label><input class="input" type="date" id="quDate"></div>
-      <div><label class="f">Gültig bis</label><input class="input" type="date" id="quValid"></div>
+      <div><label class="f" for="quDate">Datum</label><input class="input" type="date" id="quDate"></div>
+      <div><label class="f" for="quValid">Gültig bis</label><input class="input" type="date" id="quValid"></div>
     </div>
-    <label class="f">Positionen</label>
+    <div class="f">Positionen</div>
     <div id="quItems"></div>
     <button class="btn ghost block" id="quAddItem" style="margin-top:2px">+ Position hinzufügen</button>
     <div class="qtotals" id="quTotals"></div>
     <div class="grid2" style="margin-top:6px">
-      <div><label class="f">MwSt %</label><input class="input" id="quVat" inputmode="decimal" placeholder="19"></div>
-      <div><label class="f">Status</label>
+      <div><label class="f" for="quVat">MwSt %</label><input class="input" id="quVat" inputmode="decimal" placeholder="19"></div>
+      <div><label class="f" for="quStatus">Status</label>
         <select class="input" id="quStatus">
           <option value="offen">🟠 Offen</option><option value="angenommen">🟢 Angenommen</option><option value="abgelehnt">🔴 Abgelehnt</option>
         </select>
       </div>
     </div>
-    <label class="f">Hinweis (optional)</label>
+    <label class="f" for="quNote">Hinweis (optional)</label>
     <textarea class="input" id="quNote" placeholder="Zahlungsziel, Lieferbedingungen …" style="min-height:52px"></textarea>
     <button class="btn ok block" id="quSave" style="margin-top:16px">Speichern</button>
     <button class="btn danger block hidden" id="quDelete" style="margin-top:10px">Löschen</button>
