@@ -138,7 +138,7 @@
   .sheet{background:var(--surface);width:100%;max-width:560px;border-radius:22px 22px 0 0;padding:8px 16px calc(20px + var(--safe-bottom));max-height:92dvh;overflow-y:auto;animation:up .22s ease}
   @keyframes up{from{transform:translateY(30px);opacity:.5}to{transform:none;opacity:1}}
   .grab{width:42px;height:5px;border-radius:3px;background:var(--line);margin:8px auto 14px}
-  label.f{display:block;font-size:12px;color:var(--muted);font-weight:700;margin:12px 2px 6px;text-transform:uppercase;letter-spacing:.4px}
+  .f{display:block;font-size:12px;color:var(--muted);font-weight:700;margin:12px 2px 6px;text-transform:uppercase;letter-spacing:.4px}
   .input,select.input,textarea.input{width:100%;background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:13px;color:var(--text)}
   textarea.input{min-height:80px;resize:vertical}
   .colors{display:flex;gap:10px;margin-top:6px}
@@ -163,6 +163,49 @@
   .toast.show{opacity:1}
   .install-hint{background:var(--surface2);border:1px dashed var(--accent);border-radius:14px;padding:12px;font-size:13px;color:var(--muted);margin-bottom:14px}
   a{color:var(--accent)}
+
+  /* Segmented control */
+  .seg{display:flex;background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:14px;gap:4px}
+  .seg button{flex:1;background:none;border:0;color:var(--muted);padding:9px 4px;border-radius:9px;font-weight:700;font-size:13px}
+  .seg button.on{background:var(--accent);color:#fff}
+
+  /* Umsatz-Diagramm */
+  .chart-card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 14px 10px;margin-bottom:12px}
+  .chart-legend{display:flex;gap:16px;justify-content:center;margin-top:8px;font-size:12px;color:var(--muted)}
+  .chart-legend span{display:inline-flex;align-items:center;gap:6px}
+  .lg-dot{width:10px;height:10px;border-radius:3px;display:inline-block}
+
+  /* Angebot / Positionen */
+  .qitem{display:grid;grid-template-columns:1fr;gap:8px;background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:10px;margin-bottom:8px}
+  .qitem .qrow{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:center}
+  .qitem .del{background:var(--danger);border:0;color:#fff;border-radius:9px;width:38px;height:38px;font-size:18px}
+  .qtotals{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:6px}
+  .qtotals .r{display:flex;justify-content:space-between;padding:3px 0}
+  .qtotals .r.big{font-size:18px;font-weight:800;border-top:1px solid var(--line);margin-top:6px;padding-top:8px}
+  .badge-status{font-size:11px;font-weight:700;padding:5px 9px;border-radius:999px}
+  .st-offen{background:var(--warn);color:#161616}
+  .st-angenommen{background:var(--ok);color:#08130b}
+  .st-abgelehnt{background:var(--danger);color:#fff}
+
+  /* Druck-Layout (PDF via "Drucken → Als PDF speichern") */
+  #printArea{display:none}
+  @media print{
+    body{background:#fff}
+    body>*{display:none!important}
+    #printArea{display:block!important;color:#000;padding:0;max-width:100%}
+    @page{margin:16mm}
+  }
+  .doc{color:#111;font-size:13px}
+  .doc h1{font-size:22px;margin:0}
+  .doc .hd{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #2f80ff;padding-bottom:12px;margin-bottom:6px}
+  .doc table{width:100%;border-collapse:collapse;margin-top:14px}
+  .doc th{text-align:left;border-bottom:2px solid #333;padding:7px 6px;font-size:12px}
+  .doc td{border-bottom:1px solid #ccc;padding:7px 6px;vertical-align:top}
+  .doc td.num,.doc th.num{text-align:right;white-space:nowrap}
+  .doc .tot{margin-top:12px;margin-left:auto;width:60%}
+  .doc .tot .r{display:flex;justify-content:space-between;padding:3px 0}
+  .doc .tot .r.big{font-weight:800;font-size:16px;border-top:2px solid #333;margin-top:4px;padding-top:6px}
+  .doc .ft{margin-top:26px;font-size:11px;color:#555;border-top:1px solid #ccc;padding-top:8px}
 </style>
 </head>
 <body>
@@ -253,25 +296,82 @@
 
   <!-- FINANZEN -->
   <div class="view hidden" id="view-fin">
-    <h2 class="section" id="finMonthLabel">Finanzen</h2>
-    <div class="fin-sum">
-      <div class="stat"><div class="n money amount plus" id="fsIn">0 €</div><div class="l">Einnahmen (Monat)</div></div>
-      <div class="stat"><div class="n money amount minus" id="fsOut">0 €</div><div class="l">Ausgaben (Monat)</div></div>
-      <div class="stat"><div class="n money" id="fsSaldo">0 €</div><div class="l">Saldo (Monat)</div></div>
-      <div class="stat"><div class="n money amount open" id="fsOpen">0 €</div><div class="l">Rechnungen offen</div></div>
+    <div class="seg" id="finSeg">
+      <button data-fseg="buchungen" class="on">Buchungen</button>
+      <button data-fseg="umsatz">Umsatz</button>
+      <button data-fseg="angebote">Angebote</button>
     </div>
-    <div class="row" style="gap:8px;margin:14px 0 12px;flex-wrap:wrap">
-      <button class="chip share" data-ffilter="alle">Alle</button>
-      <button class="chip" data-ffilter="einnahme">Einnahmen</button>
-      <button class="chip" data-ffilter="ausgabe">Ausgaben</button>
-      <button class="chip" data-ffilter="rechnung">Rechnungen</button>
+
+    <!-- Segment: Buchungen -->
+    <div id="fseg-buchungen">
+      <h2 class="section" id="finMonthLabel">Finanzen</h2>
+      <div class="fin-sum">
+        <div class="stat"><div class="n money amount plus" id="fsIn">0 €</div><div class="l">Einnahmen (Monat)</div></div>
+        <div class="stat"><div class="n money amount minus" id="fsOut">0 €</div><div class="l">Ausgaben (Monat)</div></div>
+        <div class="stat"><div class="n money" id="fsSaldo">0 €</div><div class="l">Saldo (Monat)</div></div>
+        <div class="stat"><div class="n money amount open" id="fsOpen">0 €</div><div class="l">Rechnungen offen</div></div>
+      </div>
+      <div class="row" style="gap:8px;margin:14px 0 12px;flex-wrap:wrap">
+        <button class="chip share" data-ffilter="alle">Alle</button>
+        <button class="chip" data-ffilter="einnahme">Einnahmen</button>
+        <button class="chip" data-ffilter="ausgabe">Ausgaben</button>
+        <button class="chip" data-ffilter="rechnung">Rechnungen</button>
+      </div>
+      <div id="finList"></div>
+      <button class="btn ghost block" id="exportCsv" style="margin-top:8px">📊 Als CSV exportieren (Excel)</button>
     </div>
-    <div id="finList"></div>
-    <button class="btn ghost block" id="exportCsv" style="margin-top:8px">📊 Als CSV exportieren (Excel)</button>
+
+    <!-- Segment: Umsatz-Diagramm -->
+    <div id="fseg-umsatz" class="hidden">
+      <h2 class="section">Umsatz der letzten 6 Monate</h2>
+      <div class="chart-card">
+        <div id="chart"></div>
+        <div class="chart-legend">
+          <span><i class="lg-dot" style="background:var(--ok)"></i>Einnahmen</span>
+          <span><i class="lg-dot" style="background:var(--danger)"></i>Ausgaben</span>
+        </div>
+      </div>
+      <div class="row" style="gap:10px">
+        <div class="stat"><div class="n money amount plus" id="umIn">0 €</div><div class="l">Einnahmen (6 Mon.)</div></div>
+        <div class="stat"><div class="n money amount minus" id="umOut">0 €</div><div class="l">Ausgaben (6 Mon.)</div></div>
+        <div class="stat"><div class="n money" id="umSaldo">0 €</div><div class="l">Saldo (6 Mon.)</div></div>
+      </div>
+    </div>
+
+    <!-- Segment: Angebote -->
+    <div id="fseg-angebote" class="hidden">
+      <h2 class="section">Angebote</h2>
+      <div id="quotesList"></div>
+      <button class="btn block" id="addQuote" style="margin-top:6px">+ Neues Angebot erstellen</button>
+    </div>
   </div>
 
   <!-- MEHR -->
   <div class="view hidden" id="view-more">
+    <h2 class="section">Kunden</h2>
+    <div id="customersList"></div>
+    <button class="btn block" id="addCustomer">+ Kunde hinzufügen</button>
+
+    <h2 class="section">Firmendaten (für Angebote)</h2>
+    <div class="card">
+      <div class="muted" style="font-size:13px;margin-bottom:10px">Erscheinen im Briefkopf der Angebots-PDF.</div>
+      <label class="f" for="coName" style="margin-top:0">Firmenname</label>
+      <input class="input" id="coName" placeholder="CREATEZ GmbH">
+      <label class="f" for="coAddr">Anschrift</label>
+      <textarea class="input" id="coAddr" placeholder="Musterstraße 1&#10;12345 Musterstadt" style="min-height:56px"></textarea>
+      <div class="grid2">
+        <div><label class="f" for="coPhone">Telefon</label><input class="input" id="coPhone" placeholder="+49 …"></div>
+        <div><label class="f" for="coMail">E-Mail</label><input class="input" id="coMail" placeholder="info@createz.de"></div>
+      </div>
+      <div class="grid2">
+        <div><label class="f" for="coTax">USt-IdNr.</label><input class="input" id="coTax" placeholder="DE…"></div>
+        <div><label class="f" for="coVat">MwSt-Satz %</label><input class="input" id="coVat" inputmode="decimal" placeholder="19"></div>
+      </div>
+      <label class="f" for="coBank">IBAN / Bank</label>
+      <input class="input" id="coBank" placeholder="DE.. · Bankname">
+      <button class="btn ok block" id="coSave" style="margin-top:14px">Firmendaten speichern</button>
+    </div>
+
     <h2 class="section">Notizen</h2>
     <div id="notesList"></div>
     <button class="btn ghost block" id="addNote">+ Notiz hinzufügen</button>
@@ -291,7 +391,7 @@
 
     <h2 class="section">Einstellungen</h2>
     <div class="card">
-      <label class="f" style="margin-top:0">Dein Name (Begrüßung)</label>
+      <label class="f" for="meName" style="margin-top:0">Dein Name (Begrüßung)</label>
       <input class="input" id="meName" placeholder="Rui">
       <button class="btn ghost block" id="fabSide" style="margin-top:12px">🖐 Plus-Button: Seite wechseln (Einhand-Modus)</button>
     </div>
@@ -337,6 +437,8 @@
       <button id="qEvent"><span class="ico">📦</span>Einsatz</button>
       <button id="qTask"><span class="ico">✅</span>Aufgabe</button>
       <button id="qFin"><span class="ico">💶</span>Buchung</button>
+      <button id="qQuote"><span class="ico">📄</span>Angebot</button>
+      <button id="qCustomer"><span class="ico">🧑‍💼</span>Kunde</button>
       <button id="qNote"><span class="ico">📝</span>Notiz</button>
     </div>
     <button class="btn ghost block" id="qClose" style="margin-top:14px">Schließen</button>
@@ -348,28 +450,28 @@
   <div class="sheet">
     <div class="grab"></div>
     <div class="sheet-title" id="sheetTitle">Neuer Einsatz</div>
-    <label class="f">Titel</label>
+    <label class="f" for="fTitle">Titel</label>
     <input class="input" id="fTitle" placeholder="z.B. Kurierfahrt München → Augsburg">
     <div class="grid2">
-      <div><label class="f">Datum</label><input class="input" type="date" id="fDate"></div>
-      <div><label class="f">Typ</label>
+      <div><label class="f" for="fDate">Datum</label><input class="input" type="date" id="fDate"></div>
+      <div><label class="f" for="fType">Typ</label>
         <select class="input" id="fType">
           <option>Transport</option><option>Kurier</option><option>Termin</option><option>Bereitschaft</option>
         </select>
       </div>
     </div>
     <div class="grid2">
-      <div><label class="f">Von</label><input class="input" type="time" id="fStart"></div>
-      <div><label class="f">Bis</label><input class="input" type="time" id="fEnd"></div>
+      <div><label class="f" for="fStart">Von</label><input class="input" type="time" id="fStart"></div>
+      <div><label class="f" for="fEnd">Bis</label><input class="input" type="time" id="fEnd"></div>
     </div>
-    <label class="f">Ort / Route</label>
+    <label class="f" for="fLoc">Ort / Route</label>
     <input class="input" id="fLoc" placeholder="Abhol- / Zielort">
-    <label class="f">Partner / Fahrer</label>
+    <label class="f" for="fPartner">Partner / Fahrer</label>
     <input class="input" id="fPartner" placeholder="z.B. Fahrer / Subunternehmer" list="partnerOptions">
     <datalist id="partnerOptions"></datalist>
-    <label class="f">Notiz</label>
+    <label class="f" for="fNote">Notiz</label>
     <textarea class="input" id="fNote" placeholder="Details, Kontakt, Ladung …"></textarea>
-    <label class="f">Farbe</label>
+    <div class="f">Farbe</div>
     <div class="colors" id="colors"></div>
     <button class="btn ok block" id="saveEvent" style="margin-top:20px">Speichern</button>
     <button class="btn danger block hidden" id="deleteEvent" style="margin-top:10px">Löschen</button>
@@ -382,11 +484,11 @@
   <div class="sheet">
     <div class="grab"></div>
     <div class="sheet-title" id="tSheetTitle">Neue Aufgabe</div>
-    <label class="f">Aufgabe</label>
+    <label class="f" for="tTitle">Aufgabe</label>
     <input class="input" id="tTitle" placeholder="z.B. Angebot an Kunde senden">
     <div class="grid2">
-      <div><label class="f">Fällig am</label><input class="input" type="date" id="tDue"></div>
-      <div><label class="f">Priorität</label>
+      <div><label class="f" for="tDue">Fällig am</label><input class="input" type="date" id="tDue"></div>
+      <div><label class="f" for="tPrio">Priorität</label>
         <select class="input" id="tPrio"><option value="hoch">🔴 Hoch</option><option value="mittel" selected>🟡 Mittel</option><option value="niedrig">🟢 Niedrig</option></select>
       </div>
     </div>
@@ -401,20 +503,20 @@
   <div class="sheet">
     <div class="grab"></div>
     <div class="sheet-title" id="fiSheetTitle">Neue Buchung</div>
-    <label class="f">Typ</label>
+    <label class="f" for="fiType">Typ</label>
     <select class="input" id="fiType">
       <option value="einnahme">💰 Einnahme</option>
       <option value="ausgabe">💸 Ausgabe</option>
       <option value="rechnung">🧾 Rechnung (an Kunde)</option>
     </select>
-    <label class="f">Bezeichnung</label>
+    <label class="f" for="fiLabel">Bezeichnung</label>
     <input class="input" id="fiLabel" placeholder="z.B. Transport Meier GmbH">
     <div class="grid2">
-      <div><label class="f">Betrag (€)</label><input class="input" id="fiAmount" inputmode="decimal" placeholder="z.B. 250,00"></div>
-      <div><label class="f">Datum</label><input class="input" type="date" id="fiDate"></div>
+      <div><label class="f" for="fiAmount">Betrag (€)</label><input class="input" id="fiAmount" inputmode="decimal" placeholder="z.B. 250,00"></div>
+      <div><label class="f" for="fiDate">Datum</label><input class="input" type="date" id="fiDate"></div>
     </div>
     <div id="fiStatusWrap">
-      <label class="f">Status</label>
+      <label class="f" for="fiStatus">Status</label>
       <select class="input" id="fiStatus"><option value="offen">🟠 Offen</option><option value="bezahlt">✅ Bezahlt</option></select>
     </div>
     <button class="btn ok block" id="fiSave" style="margin-top:20px">Speichern</button>
@@ -428,7 +530,7 @@
   <div class="sheet">
     <div class="grab"></div>
     <div class="sheet-title">Notiz</div>
-    <label class="f">Text</label>
+    <label class="f" for="nText">Text</label>
     <textarea class="input" id="nText" placeholder="Kurz festhalten …" style="min-height:120px"></textarea>
     <button class="btn ok block" id="nSave" style="margin-top:18px">Speichern</button>
     <button class="btn ghost block" id="nClose" style="margin-top:10px">Abbrechen</button>
@@ -455,22 +557,75 @@
   <div class="sheet">
     <div class="grab"></div>
     <div class="sheet-title" id="pSheetTitle">Partner</div>
-    <label class="f">Name</label><input class="input" id="pName" placeholder="Firma / Fahrer">
-    <label class="f">Telefon</label><input class="input" id="pPhone" placeholder="+49 …" type="tel">
-    <label class="f">Notiz</label><input class="input" id="pNote" placeholder="Fahrzeug, Verfügbarkeit …">
+    <label class="f" for="pName">Name</label><input class="input" id="pName" placeholder="Firma / Fahrer">
+    <label class="f" for="pPhone">Telefon</label><input class="input" id="pPhone" placeholder="+49 …" type="tel">
+    <label class="f" for="pNote">Notiz</label><input class="input" id="pNote" placeholder="Fahrzeug, Verfügbarkeit …">
     <button class="btn ok block" id="pSave" style="margin-top:18px">Speichern</button>
     <button class="btn danger block hidden" id="pDelete" style="margin-top:10px">Löschen</button>
     <button class="btn ghost block" id="pClose" style="margin-top:10px">Abbrechen</button>
   </div>
 </div>
 
+<!-- CUSTOMER SHEET -->
+<div class="sheet-bg" id="customerSheet">
+  <div class="sheet">
+    <div class="grab"></div>
+    <div class="sheet-title" id="cuSheetTitle">Kunde</div>
+    <label class="f" for="cuName">Firma / Name</label><input class="input" id="cuName" placeholder="z.B. Meier GmbH">
+    <label class="f" for="cuContact">Ansprechpartner</label><input class="input" id="cuContact" placeholder="Vor- und Nachname">
+    <div class="grid2">
+      <div><label class="f" for="cuPhone">Telefon</label><input class="input" id="cuPhone" type="tel" placeholder="+49 …"></div>
+      <div><label class="f" for="cuMail">E-Mail</label><input class="input" id="cuMail" placeholder="kunde@…"></div>
+    </div>
+    <label class="f" for="cuAddr">Anschrift</label>
+    <textarea class="input" id="cuAddr" placeholder="Straße&#10;PLZ Ort" style="min-height:56px"></textarea>
+    <label class="f" for="cuNote">Notiz</label><input class="input" id="cuNote" placeholder="Konditionen, Hinweise …">
+    <button class="btn ok block" id="cuSave" style="margin-top:16px">Speichern</button>
+    <button class="btn danger block hidden" id="cuDelete" style="margin-top:10px">Löschen</button>
+    <button class="btn ghost block" id="cuClose" style="margin-top:10px">Abbrechen</button>
+  </div>
+</div>
+
+<!-- QUOTE SHEET -->
+<div class="sheet-bg" id="quoteSheet">
+  <div class="sheet">
+    <div class="grab"></div>
+    <div class="sheet-title" id="quSheetTitle">Neues Angebot</div>
+    <label class="f" for="quCustomer">Kunde</label>
+    <input class="input" id="quCustomer" placeholder="Kunde wählen/eingeben" list="customerOptions">
+    <datalist id="customerOptions"></datalist>
+    <div class="grid2">
+      <div><label class="f" for="quDate">Datum</label><input class="input" type="date" id="quDate"></div>
+      <div><label class="f" for="quValid">Gültig bis</label><input class="input" type="date" id="quValid"></div>
+    </div>
+    <div class="f">Positionen</div>
+    <div id="quItems"></div>
+    <button class="btn ghost block" id="quAddItem" style="margin-top:2px">+ Position hinzufügen</button>
+    <div class="qtotals" id="quTotals"></div>
+    <div class="grid2" style="margin-top:6px">
+      <div><label class="f" for="quVat">MwSt %</label><input class="input" id="quVat" inputmode="decimal" placeholder="19"></div>
+      <div><label class="f" for="quStatus">Status</label>
+        <select class="input" id="quStatus">
+          <option value="offen">🟠 Offen</option><option value="angenommen">🟢 Angenommen</option><option value="abgelehnt">🔴 Abgelehnt</option>
+        </select>
+      </div>
+    </div>
+    <label class="f" for="quNote">Hinweis (optional)</label>
+    <textarea class="input" id="quNote" placeholder="Zahlungsziel, Lieferbedingungen …" style="min-height:52px"></textarea>
+    <button class="btn ok block" id="quSave" style="margin-top:16px">Speichern</button>
+    <button class="btn danger block hidden" id="quDelete" style="margin-top:10px">Löschen</button>
+    <button class="btn ghost block" id="quClose" style="margin-top:10px">Abbrechen</button>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div>
+<div id="printArea"></div>
 
 <script>
 "use strict";
 /* ---------- Storage ---------- */
 const DB = {
-  get(k, d){ try{ return JSON.parse(localStorage.getItem('cz_'+k)) ?? d }catch(e){ return d } },
+  get(k, d){ try{ return JSON.parse(localStorage.getItem('cz_'+k)) ?? d }catch{ return d } },
   set(k, v){ localStorage.setItem('cz_'+k, JSON.stringify(v)) }
 };
 let events   = DB.get('events', []);
@@ -478,19 +633,29 @@ let partners = DB.get('partners', []);
 let tasks    = DB.get('tasks', []);
 let fin      = DB.get('fin', []);
 let notes    = DB.get('notes', []);
+let customers= DB.get('customers', []);
+let quotes   = DB.get('quotes', []);
+let company  = DB.get('company', {name:'CREATEZ GmbH',addr:'',phone:'',mail:'',tax:'',vat:'19',bank:''});
 // Defekte Daten (z.B. aus fehlerhaftem Backup) dürfen die App nie dauerhaft brechen
-if(!Array.isArray(events))   events=[];
-if(!Array.isArray(partners)) partners=[];
-if(!Array.isArray(tasks))    tasks=[];
-if(!Array.isArray(fin))      fin=[];
-if(!Array.isArray(notes))    notes=[];
+if(!Array.isArray(events))    events=[];
+if(!Array.isArray(partners))  partners=[];
+if(!Array.isArray(tasks))     tasks=[];
+if(!Array.isArray(fin))       fin=[];
+if(!Array.isArray(notes))     notes=[];
+if(!Array.isArray(customers)) customers=[];
+if(!Array.isArray(quotes))    quotes=[];
+if(!company||typeof company!=='object') company={name:'CREATEZ GmbH',vat:'19'};
 const COLORS = ['#2f80ff','#2ec16b','#f5a623','#f2545b','#a06bff','#18b6c9'];
 const PRIOC  = {hoch:'#f2545b',mittel:'#f5a623',niedrig:'#2ec16b'};
 const PRIOW  = {hoch:0,mittel:1,niedrig:2};
 const TYPEL  = {einnahme:'Einnahme',ausgabe:'Ausgabe',rechnung:'Rechnung'};
+const QSTAT  = {offen:'Offen',angenommen:'Angenommen',abgelehnt:'Abgelehnt'};
 
-function uid(){ return 'x'+Math.random().toString(36).slice(2,9)+Date.now().toString(36).slice(-3) }
-function save(){ DB.set('events',events); DB.set('partners',partners); DB.set('tasks',tasks); DB.set('fin',fin); DB.set('notes',notes) }
+function uid(){
+  const a=new Uint32Array(2); crypto.getRandomValues(a);
+  return 'x'+a[0].toString(36)+a[1].toString(36)+Date.now().toString(36).slice(-3);
+}
+function save(){ DB.set('events',events); DB.set('partners',partners); DB.set('tasks',tasks); DB.set('fin',fin); DB.set('notes',notes); DB.set('customers',customers); DB.set('quotes',quotes); DB.set('company',company) }
 function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2200) }
 const pad=n=>String(n).padStart(2,'0');
 const iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
@@ -547,7 +712,10 @@ async function handlePin(){
   if(pinMode==='login'){
     const h=await hash(entered);
     const ok = stored ? h===stored : entered==='1234';
-    if(ok){ if(!stored) DB.set('pinHash', await hash('1234')); enterApp(); }
+    if(ok){
+      if(!stored){ DB.set('pinHash', await hash('1234')); }
+      enterApp();
+    }
     else { toast('Falsche PIN'); navigator.vibrate&&navigator.vibrate(200); renderDots(); }
   } else if(pinMode==='set1'){
     tmpPin=entered; pinMode='set2';
@@ -589,7 +757,16 @@ document.getElementById('nav').addEventListener('click',e=>{
   if(activeView==='cal'){ renderCalendar(); renderDay(); }
   if(activeView==='tasks') renderTasks();
   if(activeView==='fin') renderFin();
-  if(activeView==='more'){ renderPartners(); renderNotes(); }
+  if(activeView==='more'){ renderPartners(); renderNotes(); renderCustomers(); loadCompanyForm(); }
+});
+// Finanzen-Segmente: Buchungen / Umsatz / Angebote
+let finSeg='buchungen';
+document.getElementById('finSeg').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  finSeg=b.dataset.fseg;
+  document.querySelectorAll('#finSeg button').forEach(x=>x.classList.toggle('on',x===b));
+  ['buchungen','umsatz','angebote'].forEach(s=>document.getElementById('fseg-'+s).classList.toggle('hidden',s!==finSeg));
+  renderFin();
 });
 // PWA wird auf dem Handy fortgesetzt statt neu geladen → beim Zurückkehren auffrischen
 document.addEventListener('visibilitychange',()=>{
@@ -611,14 +788,22 @@ function nextEvent(){
 function relLabel(ev){
   const today=iso(new Date());
   const dLabel = ev.date===today ? 'Heute' : fmtDate(ev.date);
-  const t = ev.start ? ' · '+ev.start+(ev.end?'–'+ev.end:'')+' Uhr' : '';
+  let t='';
+  if(ev.start){
+    const endPart=ev.end?'–'+ev.end:'';
+    t=' · '+ev.start+endPart+' Uhr';
+  }
   let rel='';
   if(ev.start||ev.date>today){
     const target=new Date(ev.date+'T'+(ev.start||'00:00'));
     const diff=target-new Date();
     if(diff>0){
       const m=Math.round(diff/60000);
-      rel=' · in '+(m<60 ? m+' Min' : m<2880 ? Math.floor(m/60)+' Std '+(m%60)+' Min' : Math.round(m/1440)+' Tagen');
+      let relTxt;
+      if(m<60) relTxt=m+' Min';
+      else if(m<2880) relTxt=Math.floor(m/60)+' Std '+(m%60)+' Min';
+      else relTxt=Math.round(m/1440)+' Tagen';
+      rel=' · in '+relTxt;
     }
   }
   return dLabel+t+rel;
@@ -627,7 +812,10 @@ function renderHome(){
   const now=new Date();
   const h=now.getHours();
   const name=DB.get('name','Rui');
-  document.getElementById('greetTitle').textContent=(h<11?'Guten Morgen':h<18?'Guten Tag':'Guten Abend')+', '+name+'!';
+  let greet='Guten Abend';
+  if(h<11) greet='Guten Morgen';
+  else if(h<18) greet='Guten Tag';
+  document.getElementById('greetTitle').textContent=greet+', '+name+'!';
   document.getElementById('greetDate').textContent=WDLONG[now.getDay()]+', '+now.getDate()+'. '+MONTHS[now.getMonth()]+' '+now.getFullYear();
 
   const ne=nextEvent(), nc=document.getElementById('nextEvCard');
@@ -679,7 +867,7 @@ document.getElementById('shareBriefing').onclick=async()=>{
   try{
     if(navigator.share){ await navigator.share({title:'Tagesbriefing',text}); return }
     await navigator.clipboard.writeText(text); toast('Briefing kopiert');
-  }catch(e){}
+  }catch(err){ if(err&&err.name!=='AbortError') toast('Teilen nicht möglich'); }
 };
 
 /* Quick actions */
@@ -691,6 +879,8 @@ document.getElementById('qEvent').onclick=()=>{closeSheet('quickSheet');openEven
 document.getElementById('qTask').onclick=()=>{closeSheet('quickSheet');openTask(null)};
 document.getElementById('qFin').onclick=()=>{closeSheet('quickSheet');openFin(null)};
 document.getElementById('qNote').onclick=()=>{closeSheet('quickSheet');openNote()};
+document.getElementById('qQuote').onclick=()=>{closeSheet('quickSheet');openQuote(null)};
+document.getElementById('qCustomer').onclick=()=>{closeSheet('quickSheet');openCustomer(null)};
 document.getElementById('qClose').onclick=()=>closeSheet('quickSheet');
 
 /* FAB: context-dependent */
@@ -698,7 +888,7 @@ document.getElementById('fab').onclick=()=>{
   if(activeView==='home') openSheet('quickSheet');
   else if(activeView==='cal') openEvent(null);
   else if(activeView==='tasks') openTask(null);
-  else if(activeView==='fin') openFin(null);
+  else if(activeView==='fin'){ finSeg==='angebote' ? openQuote(null) : openFin(null); }
 };
 function applyFabSide(){ document.getElementById('fab').classList.toggle('left', !!DB.get('fabLeft',false)) }
 document.getElementById('fabSide').onclick=()=>{ DB.set('fabLeft', !DB.get('fabLeft',false)); applyFabSide(); toast('Plus-Button verschoben') };
@@ -746,7 +936,11 @@ function renderDay(){
 }
 function eventCard(ev){
   const el=document.createElement('div'); el.className='event';
-  const time = ev.start ? (ev.start + (ev.end?('–'+ev.end):'')) : 'ganztägig';
+  let time='ganztägig';
+  if(ev.start){
+    const endPart=ev.end?'–'+ev.end:'';
+    time=ev.start+endPart;
+  }
   el.innerHTML=`
     <div class="bar" style="background:${ev.color||'#2f80ff'}"></div>
     <div class="body">
@@ -829,11 +1023,13 @@ function taskRow(t){
   const el=document.createElement('div'); el.className='task'+(t.done?' done':'');
   const today=iso(new Date());
   const overdue=!t.done&&t.due&&t.due<today;
+  const oduePrefix=overdue?'⚠️ überfällig · ':'';
+  const dueTxt=t.due?(oduePrefix+'fällig '+fmtShort(t.due)):'ohne Frist';
   el.innerHTML=`<button class="cb">✓</button>
     <div class="tt">
       <div class="t">${esc(t.title)}</div>
       <div class="meta" style="font-size:12px;${overdue?'color:var(--danger)':''}">
-        ${t.due?((overdue?'⚠️ überfällig · ':'')+'fällig '+fmtShort(t.due)):'ohne Frist'}
+        ${dueTxt}
         · <span style="color:${PRIOC[t.prio]||PRIOC.mittel}">●</span> ${esc(t.prio||'mittel')}
       </div>
     </div>
@@ -887,10 +1083,16 @@ function finRow(f){
   const el=document.createElement('div'); el.className='task';
   const isOut=f.type==='ausgabe';
   const isOpenInv=f.type==='rechnung'&&!f.paid;
-  const cls=isOut?'minus':(isOpenInv?'open':'plus');
-  const badge=f.type==='rechnung'
-    ? `<button class="chip${f.paid?'':' share'}" data-paid style="${f.paid?'':'background:var(--warn);border-color:var(--warn);color:#161616'}">${f.paid?'BEZAHLT':'OFFEN'}</button>`
-    : '';
+  let cls='plus';
+  if(isOut) cls='minus';
+  else if(isOpenInv) cls='open';
+  let badge='';
+  if(f.type==='rechnung'){
+    const paidCls=f.paid?'':' share';
+    const paidStyle=f.paid?'':'background:var(--warn);border-color:var(--warn);color:#161616';
+    const paidTxt=f.paid?'BEZAHLT':'OFFEN';
+    badge=`<button class="chip${paidCls}" data-paid style="${paidStyle}">${paidTxt}</button>`;
+  }
   el.innerHTML=`<div class="tt">
       <div class="t">${esc(f.label)}</div>
       <div class="meta" style="font-size:12px">${fmtShort(f.date)} · ${TYPEL[f.type]||f.type}</div>
@@ -898,7 +1100,10 @@ function finRow(f){
     ${badge}
     <div class="amount ${cls}">${isOut?'−':'+'} ${eur(f.amount)}</div>`;
   el.style.cursor='pointer';
-  el.onclick=e=>{ if(e.target.closest('[data-paid]')) return; openFin(f); };
+  el.onclick=e=>{
+    if(e.target.closest('[data-paid]')){ return; }
+    openFin(f);
+  };
   const pb=el.querySelector('[data-paid]');
   if(pb) pb.onclick=e=>{ e.stopPropagation(); f.paid=!f.paid; save(); renderFin(); renderHome(); toast(f.paid?'Als bezahlt markiert ✅':'Als offen markiert'); };
   return el;
@@ -924,8 +1129,272 @@ function renderFin(){
   const box=document.getElementById('finList'); box.innerHTML='';
   let list=[...fin].sort((a,b)=>(b.date||'').localeCompare(a.date||''));
   if(fFilter!=='alle') list=list.filter(f=>f.type===fFilter);
-  if(!list.length){ box.innerHTML='<div class="empty">Keine Buchungen. Mit ＋ hinzufügen.</div>'; return }
-  list.forEach(f=>box.appendChild(finRow(f)));
+  if(!list.length){ box.innerHTML='<div class="empty">Keine Buchungen. Mit ＋ hinzufügen.</div>'; }
+  else list.forEach(f=>box.appendChild(finRow(f)));
+
+  renderChart();
+  renderQuotes();
+}
+
+/* ---------- Umsatz-Diagramm (SVG, ohne externe Bibliothek) ---------- */
+function monthKey(d){ return d.getFullYear()+'-'+pad(d.getMonth()+1) }
+function last6Months(){
+  const now=new Date(), arr=[];
+  for(let i=5;i>=0;i--){ const d=new Date(now.getFullYear(),now.getMonth()-i,1); arr.push({key:monthKey(d),label:MONTHS[d.getMonth()].slice(0,3)}); }
+  return arr;
+}
+function renderChart(){
+  const months=last6Months();
+  const data=months.map(m=>({
+    ...m,
+    ein:fin.filter(f=>f.date&&f.date.startsWith(m.key)&&(f.type==='einnahme'||(f.type==='rechnung'&&f.paid))).reduce((s,f)=>s+f.amount,0),
+    aus:fin.filter(f=>f.date&&f.date.startsWith(m.key)&&f.type==='ausgabe').reduce((s,f)=>s+f.amount,0)
+  }));
+  const totIn=data.reduce((s,d)=>s+d.ein,0), totOut=data.reduce((s,d)=>s+d.aus,0);
+  document.getElementById('umIn').textContent='+ '+eurShort(totIn);
+  document.getElementById('umOut').textContent='− '+eurShort(totOut);
+  const um=document.getElementById('umSaldo'), sal=totIn-totOut;
+  um.textContent=(sal<0?'− ':'')+eurShort(Math.abs(sal)); um.style.color=sal<0?'var(--danger)':'var(--ok)';
+
+  const max=Math.max(1,...data.map(d=>Math.max(d.ein,d.aus)));
+  const W=320,H=170,bw=W/6,gap=6,barW=(bw-gap*2)/2, base=H-22;
+  let bars='';
+  data.forEach((d,i)=>{
+    const x0=i*bw;
+    const hIn=Math.round((base-6)*(d.ein/max)), hOut=Math.round((base-6)*(d.aus/max));
+    bars+=`<rect x="${x0+gap}" y="${base-hIn}" width="${barW}" height="${hIn}" rx="3" fill="#2ec16b"/>`;
+    bars+=`<rect x="${x0+gap+barW}" y="${base-hOut}" width="${barW}" height="${hOut}" rx="3" fill="#f2545b"/>`;
+    bars+=`<text x="${x0+bw/2}" y="${base+14}" fill="#93a1b3" font-size="11" text-anchor="middle">${d.label}</text>`;
+  });
+  document.getElementById('chart').innerHTML=
+    `<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="Umsatz je Monat">`+
+    `<line x1="0" y1="${base}" x2="${W}" y2="${base}" stroke="#2a333f"/>${bars}</svg>`;
+}
+
+/* ---------- Kundenverwaltung ---------- */
+let editingC=null;
+function customerByName(n){ return customers.find(c=>c.name===n) }
+function refreshCustomerOptions(){
+  const dl=document.getElementById('customerOptions'); if(!dl) return;
+  dl.innerHTML=''; customers.forEach(c=>{const o=document.createElement('option');o.value=c.name;dl.appendChild(o)});
+}
+function renderCustomers(){
+  const box=document.getElementById('customersList'); box.innerHTML='';
+  if(!customers.length){ box.innerHTML='<div class="empty">Noch keine Kunden.</div>'; }
+  [...customers].sort((a,b)=>a.name.localeCompare(b.name)).forEach(c=>{
+    const el=document.createElement('div'); el.className='card'; el.style.marginBottom='10px';
+    el.innerHTML=`<div class="row"><div style="flex:1;min-width:0">
+        <b>${esc(c.name)}</b>
+        ${c.contact?`<div class="meta" style="font-size:13px">👤 ${esc(c.contact)}</div>`:''}
+        ${c.phone?`<div class="meta" style="font-size:13px">📞 ${esc(c.phone)}</div>`:''}
+        ${c.mail?`<div class="meta" style="font-size:13px">✉️ ${esc(c.mail)}</div>`:''}
+      </div>
+      ${c.phone?`<a class="chip" href="tel:${esc(c.phone)}">📞</a>`:''}
+      ${c.mail?`<a class="chip" href="mailto:${esc(c.mail)}">✉️</a>`:''}
+      <button class="chip" data-edit>✏️</button></div>`;
+    el.querySelector('[data-edit]').onclick=()=>openCustomer(c);
+    box.appendChild(el);
+  });
+  refreshCustomerOptions();
+}
+function openCustomer(c){
+  editingC=c||null;
+  document.getElementById('cuSheetTitle').textContent=c?'Kunde bearbeiten':'Neuer Kunde';
+  document.getElementById('cuName').value=c?.name||'';
+  document.getElementById('cuContact').value=c?.contact||'';
+  document.getElementById('cuPhone').value=c?.phone||'';
+  document.getElementById('cuMail').value=c?.mail||'';
+  document.getElementById('cuAddr').value=c?.addr||'';
+  document.getElementById('cuNote').value=c?.note||'';
+  document.getElementById('cuDelete').classList.toggle('hidden',!c);
+  openSheet('customerSheet');
+}
+document.getElementById('addCustomer').onclick=()=>openCustomer(null);
+document.getElementById('cuSave').onclick=()=>{
+  const name=document.getElementById('cuName').value.trim(); if(!name){ toast('Bitte Firma/Name'); return }
+  const data={name,contact:document.getElementById('cuContact').value.trim(),
+    phone:document.getElementById('cuPhone').value.trim(),mail:document.getElementById('cuMail').value.trim(),
+    addr:document.getElementById('cuAddr').value.trim(),note:document.getElementById('cuNote').value.trim()};
+  if(editingC) Object.assign(editingC,data); else { data.id=uid(); customers.push(data); }
+  save(); closeSheet('customerSheet'); renderCustomers(); toast('Gespeichert');
+};
+document.getElementById('cuDelete').onclick=()=>{
+  if(editingC&&confirm('Kunde löschen?')){ customers=customers.filter(x=>x!==editingC); save(); closeSheet('customerSheet'); renderCustomers(); }
+};
+document.getElementById('cuClose').onclick=()=>closeSheet('customerSheet');
+
+/* ---------- Firmendaten ---------- */
+function loadCompanyForm(){
+  document.getElementById('coName').value=company.name||'';
+  document.getElementById('coAddr').value=company.addr||'';
+  document.getElementById('coPhone').value=company.phone||'';
+  document.getElementById('coMail').value=company.mail||'';
+  document.getElementById('coTax').value=company.tax||'';
+  document.getElementById('coVat').value=company.vat||'19';
+  document.getElementById('coBank').value=company.bank||'';
+}
+document.getElementById('coSave').onclick=()=>{
+  company={name:document.getElementById('coName').value.trim()||'CREATEZ GmbH',
+    addr:document.getElementById('coAddr').value.trim(),phone:document.getElementById('coPhone').value.trim(),
+    mail:document.getElementById('coMail').value.trim(),tax:document.getElementById('coTax').value.trim(),
+    vat:document.getElementById('coVat').value.trim()||'19',bank:document.getElementById('coBank').value.trim()};
+  save(); toast('Firmendaten gespeichert');
+};
+
+/* ---------- Angebote ---------- */
+let editingQ=null, qItems=[];
+function quoteNet(q){ return (q.items||[]).reduce((s,it)=>s+(Number(it.qty)||0)*(Number(it.price)||0),0) }
+function quoteTax(q){ return quoteNet(q)*((Number(q.vat)||0)/100) }
+function quoteGross(q){ return quoteNet(q)+quoteTax(q) }
+function nextQuoteNo(){
+  const y=new Date().getFullYear();
+  const n=quotes.filter(q=>q.number&&q.number.includes('-'+y+'-')).length+1;
+  return 'ANG-'+y+'-'+pad(n);
+}
+function renderQuotes(){
+  const box=document.getElementById('quotesList'); box.innerHTML='';
+  if(!quotes.length){ box.innerHTML='<div class="empty">Noch keine Angebote.</div>'; return }
+  [...quotes].sort((a,b)=>(b.date||'').localeCompare(a.date||'')).forEach(q=>{
+    const el=document.createElement('div'); el.className='card'; el.style.marginBottom='10px';
+    el.innerHTML=`<div class="row" style="justify-content:space-between">
+        <div style="min-width:0"><b>${esc(q.number||'Angebot')}</b>
+          <div class="meta" style="font-size:13px">${esc(q.customer||'—')} · ${q.date?fmtShort(q.date):''}</div>
+        </div>
+        <span class="badge-status st-${q.status||'offen'}">${QSTAT[q.status]||'Offen'}</span>
+      </div>
+      <div class="row" style="justify-content:space-between;margin-top:8px">
+        <span class="amount plus">${eur(quoteGross(q))}</span>
+        <span class="meta" style="font-size:12px">${(q.items||[]).length} Position(en)</span>
+      </div>
+      <div class="acts" style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+        <button class="chip share" data-pdf>🖨 PDF / Drucken</button>
+        <button class="chip" data-edit>✏️ Bearbeiten</button>
+        <button class="chip" data-inv>🧾 Als Rechnung</button>
+      </div>`;
+    el.querySelector('[data-pdf]').onclick=()=>printQuote(q);
+    el.querySelector('[data-edit]').onclick=()=>openQuote(q);
+    el.querySelector('[data-inv]').onclick=()=>quoteToInvoice(q);
+    box.appendChild(el);
+  });
+}
+function renderQItems(){
+  const box=document.getElementById('quItems'); box.innerHTML='';
+  qItems.forEach((it,i)=>{
+    const el=document.createElement('div'); el.className='qitem';
+    el.innerHTML=`<input class="input" placeholder="Beschreibung" data-desc value="${esc(it.desc||'')}">
+      <div class="qrow">
+        <input class="input" inputmode="decimal" placeholder="Menge" data-qty value="${it.qty??''}">
+        <input class="input" inputmode="decimal" placeholder="Einzelpreis €" data-price value="${it.price??''}">
+        <button class="del" data-del>×</button>
+      </div>`;
+    el.querySelector('[data-desc]').oninput=e=>{it.desc=e.target.value};
+    el.querySelector('[data-qty]').oninput=e=>{it.qty=parseAmount(e.target.value)||0;updateQTotals()};
+    el.querySelector('[data-price]').oninput=e=>{it.price=parseAmount(e.target.value)||0;updateQTotals()};
+    el.querySelector('[data-del]').onclick=()=>{qItems.splice(i,1);renderQItems();updateQTotals()};
+    box.appendChild(el);
+  });
+}
+function updateQTotals(){
+  const vat=parseAmount(document.getElementById('quVat').value)||0;
+  const net=qItems.reduce((s,it)=>s+(Number(it.qty)||0)*(Number(it.price)||0),0);
+  const tax=net*vat/100;
+  document.getElementById('quTotals').innerHTML=
+    `<div class="r"><span>Netto</span><b>${eur(net)}</b></div>
+     <div class="r"><span>MwSt (${vat}%)</span><b>${eur(tax)}</b></div>
+     <div class="r big"><span>Gesamt</span><span>${eur(net+tax)}</span></div>`;
+}
+function openQuote(q){
+  editingQ=q||null;
+  document.getElementById('quSheetTitle').textContent=q?'Angebot bearbeiten':'Neues Angebot';
+  document.getElementById('quCustomer').value=q?.customer||'';
+  document.getElementById('quDate').value=q?.date||iso(new Date());
+  document.getElementById('quValid').value=q?.valid||'';
+  document.getElementById('quVat').value=(q?q.vat:company.vat)||'19';
+  document.getElementById('quStatus').value=q?.status||'offen';
+  document.getElementById('quNote').value=q?.note||'';
+  qItems=q?JSON.parse(JSON.stringify(q.items||[])):[{desc:'',qty:1,price:0}];
+  if(!qItems.length) qItems=[{desc:'',qty:1,price:0}];
+  renderQItems(); updateQTotals(); refreshCustomerOptions();
+  document.getElementById('quDelete').classList.toggle('hidden',!q);
+  openSheet('quoteSheet');
+}
+document.getElementById('addQuote').onclick=()=>openQuote(null);
+document.getElementById('quAddItem').onclick=()=>{ qItems.push({desc:'',qty:1,price:0}); renderQItems(); updateQTotals(); };
+document.getElementById('quVat').oninput=updateQTotals;
+document.getElementById('quSave').onclick=()=>{
+  const customer=document.getElementById('quCustomer').value.trim();
+  const items=qItems.filter(it=>(it.desc||'').trim()||Number(it.price)>0);
+  if(!customer){ toast('Bitte Kunde angeben'); return }
+  if(!items.length){ toast('Mindestens eine Position'); return }
+  const data={customer,date:document.getElementById('quDate').value||iso(new Date()),
+    valid:document.getElementById('quValid').value,
+    vat:parseAmount(document.getElementById('quVat').value)||0,
+    status:document.getElementById('quStatus').value,
+    note:document.getElementById('quNote').value.trim(),
+    items:items.map(it=>({desc:(it.desc||'').trim(),qty:Number(it.qty)||0,price:Number(it.price)||0}))};
+  if(editingQ) Object.assign(editingQ,data);
+  else { data.id=uid(); data.number=nextQuoteNo(); quotes.push(data); }
+  save(); closeSheet('quoteSheet'); renderFin(); toast('Angebot gespeichert');
+};
+document.getElementById('quDelete').onclick=()=>{
+  if(editingQ&&confirm('Angebot löschen?')){ quotes=quotes.filter(x=>x!==editingQ); save(); closeSheet('quoteSheet'); renderFin(); }
+};
+document.getElementById('quClose').onclick=()=>closeSheet('quoteSheet');
+
+function quoteToInvoice(q){
+  if(!confirm('Angebot '+(q.number||'')+' als offene Rechnung in die Finanzen übernehmen?')) return;
+  fin.push({id:uid(),type:'rechnung',label:(q.number?q.number+' · ':'')+(q.customer||'Angebot'),
+    amount:Math.round(quoteGross(q)*100)/100,date:iso(new Date()),paid:false});
+  save(); toast('Als Rechnung übernommen'); renderHome();
+}
+
+/* PDF: sauberes Druck-Layout → Browser „Drucken → Als PDF speichern" (offline, ohne Bibliothek) */
+function printQuote(q){
+  const net=quoteNet(q),tax=quoteTax(q),gross=quoteGross(q);
+  const rows=(q.items||[]).map(it=>{
+    const line=(Number(it.qty)||0)*(Number(it.price)||0);
+    return `<tr><td>${esc(it.desc||'')}</td><td class="num">${(Number(it.qty)||0).toLocaleString('de-DE')}</td>
+      <td class="num">${eur(it.price)}</td><td class="num">${eur(line)}</td></tr>`;
+  }).join('');
+  const cust=customerByName(q.customer);
+  let custBlock=`<b>${esc(q.customer||'')}</b>`;
+  if(cust){
+    const contactLine=cust.contact?esc(cust.contact)+'<br>':'';
+    const addrLines=cust.addr?esc(cust.addr).replace(/\n/g,'<br>'):'';
+    custBlock=`<b>${esc(cust.name)}</b><br>${contactLine}${addrLines}`;
+  }
+  document.getElementById('printArea').innerHTML=`
+    <div class="doc">
+      <div class="hd">
+        <div><h1>${esc(company.name||'CREATEZ GmbH')}</h1>
+          <div style="font-size:11px;color:#555;white-space:pre-line;margin-top:4px">${esc([company.addr,company.phone,company.mail].filter(Boolean).join('\n'))}</div>
+        </div>
+        <div style="text-align:right;font-size:12px">
+          <div style="font-size:18px;font-weight:800;color:#2f80ff">ANGEBOT</div>
+          <div style="margin-top:4px">${esc(q.number||'')}</div>
+          <div>Datum: ${q.date?fmtShort(q.date):''}</div>
+          ${q.valid?`<div>Gültig bis: ${fmtShort(q.valid)}</div>`:''}
+        </div>
+      </div>
+      <div style="margin-top:18px"><div style="font-size:11px;color:#777">Angebot an:</div>${custBlock}</div>
+      <table>
+        <thead><tr><th>Beschreibung</th><th class="num">Menge</th><th class="num">Einzelpreis</th><th class="num">Betrag</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+      <div class="tot">
+        <div class="r"><span>Netto</span><span>${eur(net)}</span></div>
+        <div class="r"><span>zzgl. MwSt (${Number(q.vat)||0}%)</span><span>${eur(tax)}</span></div>
+        <div class="r big"><span>Gesamtbetrag</span><span>${eur(gross)}</span></div>
+      </div>
+      ${q.note?`<div style="margin-top:18px;white-space:pre-line">${esc(q.note)}</div>`:''}
+      <div class="ft">
+        ${esc([company.tax?('USt-IdNr.: '+company.tax):'',company.bank?('Bank: '+company.bank):''].filter(Boolean).join(' · '))}
+        <br>Dieses Angebot ist freibleibend. Vielen Dank für Ihr Interesse.
+      </div>
+    </div>`;
+  const title=document.title;
+  document.title=(q.number||'Angebot')+'_'+(q.customer||'').replace(/\s+/g,'_');
+  setTimeout(()=>{ window.print(); document.title=title; }, 60);
 }
 function openFin(f){
   editingF=f||null;
@@ -948,7 +1417,7 @@ document.getElementById('fiSave').onclick=()=>{
   const label=document.getElementById('fiLabel').value.trim();
   const amount=parseAmount(document.getElementById('fiAmount').value);
   if(!label){ toast('Bitte Bezeichnung eingeben'); return }
-  if(!(amount>0)){ toast('Bitte gültigen Betrag eingeben'); return }
+  if(Number.isNaN(amount)||amount<=0){ toast('Bitte gültigen Betrag eingeben'); return }
   const type=document.getElementById('fiType').value;
   const data={type,label,amount:Math.round(amount*100)/100,
     date:document.getElementById('fiDate').value||iso(new Date()),
@@ -966,8 +1435,9 @@ document.getElementById('exportCsv').onclick=()=>{
   const q=s=>'"'+String(s).replace(/"/g,'""')+'"'; // CSV-Quoting für Excel
   const rows=[['Datum','Typ','Bezeichnung','Betrag (EUR)','Status']];
   [...fin].sort((a,b)=>(a.date||'').localeCompare(b.date||'')).forEach(f=>{
-    rows.push([f.date,TYPEL[f.type]||f.type,q(f.label),String(f.amount).replace('.',','),
-      f.type==='rechnung'?(f.paid?'bezahlt':'offen'):'']);
+    let status='';
+    if(f.type==='rechnung') status=f.paid?'bezahlt':'offen';
+    rows.push([f.date,TYPEL[f.type]||f.type,q(f.label),String(f.amount).replace('.',','),status]);
   });
   downloadFile('createz_finanzen.csv','﻿'+rows.map(r=>r.join(';')).join('\r\n'),'text/csv;charset=utf-8');
   toast('CSV exportiert');
@@ -990,7 +1460,7 @@ function renderNotes(){
       </div>`;
     el.querySelector('[data-nshare]').onclick=async()=>{
       try{ if(navigator.share){ await navigator.share({text:n.text}); return }
-        await navigator.clipboard.writeText(n.text); toast('Kopiert'); }catch(e){}
+        await navigator.clipboard.writeText(n.text); toast('Kopiert'); }catch(err){ if(err&&err.name!=='AbortError') toast('Teilen nicht möglich'); }
     };
     el.querySelector('[data-ndel]').onclick=()=>{
       if(confirm('Notiz löschen?')){ notes=notes.filter(x=>x!==n); save(); renderNotes(); }
@@ -1012,7 +1482,7 @@ document.getElementById('nClose').onclick=()=>closeSheet('noteSheet');
 function openSheet(id){
   document.getElementById(id).classList.add('open');
   // Android-Zurück-Geste soll das Sheet schließen, nicht die App beenden
-  if(!(history.state&&history.state.czSheet)){ try{ history.pushState({czSheet:1},''); }catch(e){} }
+  if(!(history.state&&history.state.czSheet)){ try{ history.pushState({czSheet:1},''); }catch{ /* ältere Browser ohne History-API */ } }
 }
 function closeSheet(id){ document.getElementById(id).classList.remove('open') }
 window.addEventListener('popstate',()=>{ document.querySelectorAll('.sheet-bg.open').forEach(x=>x.classList.remove('open')) });
@@ -1059,7 +1529,11 @@ function downloadFile(name, content, type){
   setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 function evText(ev){
-  const t=ev.start?(ev.start+(ev.end?('–'+ev.end):'')+' Uhr'):'ganztägig';
+  let t='ganztägig';
+  if(ev.start){
+    const endPart=ev.end?'–'+ev.end:'';
+    t=ev.start+endPart+' Uhr';
+  }
   return `📦 ${ev.title}\n📅 ${fmtDate(ev.date)} · ${t}\n${ev.type?('🏷️ '+ev.type+'\n'):''}${ev.loc?('📍 '+ev.loc+'\n'):''}${ev.partner?('👤 '+ev.partner+'\n'):''}${ev.note?('📝 '+ev.note+'\n'):''}— CREATEZ GmbH`;
 }
 function gcalLink(ev){
@@ -1085,7 +1559,7 @@ document.getElementById('shShare').onclick=async()=>{
     }
     if(navigator.share){ await navigator.share({title:ev.title,text}); return; }
     await navigator.clipboard.writeText(text); toast('In Zwischenablage kopiert');
-  }catch(e){ /* abgebrochen */ }
+  }catch(err){ if(err&&err.name!=='AbortError') toast('Teilen nicht möglich'); }
 };
 document.getElementById('shWa').onclick=()=>{ window.open('https://wa.me/?text='+encodeURIComponent(evText(shareTarget)),'_blank') };
 document.getElementById('shGcal').onclick=()=>{ window.open(gcalLink(shareTarget),'_blank') };
@@ -1105,7 +1579,7 @@ document.getElementById('shareDay').onclick=async()=>{
     }
     if(navigator.share){ await navigator.share({title:'Einsätze '+selDate,text}); return; }
     await navigator.clipboard.writeText(text); toast('Kopiert');
-  }catch(e){}
+  }catch(err){ if(err&&err.name!=='AbortError') toast('Teilen nicht möglich'); }
 };
 
 /* ---------- Partners ---------- */
@@ -1160,7 +1634,7 @@ document.getElementById('shareAll').onclick=async()=>{
     const file=new File([icsFor(events)],'createz_kalender.ics',{type:'text/calendar'});
     if(navigator.canShare&&navigator.canShare({files:[file]})){ await navigator.share({title:'CREATEZ Kalender',files:[file]}); return; }
     downloadFile('createz_kalender.ics', icsFor(events),'text/calendar');
-  }catch(e){}
+  }catch(err){ if(err&&err.name!=='AbortError') toast('Teilen nicht möglich'); }
 };
 document.getElementById('importIcs').onclick=()=>document.getElementById('icsFile').click();
 document.getElementById('icsFile').onchange=e=>{
@@ -1197,18 +1671,26 @@ function importIcs(text){
   });
   save(); renderAll(); toast(n+' Termine importiert');
 }
-document.getElementById('exportJson').onclick=()=>downloadFile('createz_backup.json', JSON.stringify({events,partners,tasks,fin,notes},null,2),'application/json');
+document.getElementById('exportJson').onclick=()=>downloadFile('createz_backup.json', JSON.stringify({events,partners,tasks,fin,notes,customers,quotes,company},null,2),'application/json');
 document.getElementById('importJson').onclick=()=>document.getElementById('jsonFile').click();
 document.getElementById('jsonFile').onchange=e=>{
-  const f=e.target.files[0]; if(!f)return; const r=new FileReader();
+  const f=e.target.files[0];
+  if(!f) return;
+  const r=new FileReader();
   r.onload=()=>{ try{
       const d=JSON.parse(r.result);
       const arr=x=>Array.isArray(x);
-      if(!(arr(d.events)||arr(d.partners)||arr(d.tasks)||arr(d.fin)||arr(d.notes))) throw new Error('leer');
-      if(arr(d.events))events=d.events; if(arr(d.partners))partners=d.partners;
-      if(arr(d.tasks))tasks=d.tasks; if(arr(d.fin))fin=d.fin; if(arr(d.notes))notes=d.notes;
+      if(!(arr(d.events)||arr(d.partners)||arr(d.tasks)||arr(d.fin)||arr(d.notes)||arr(d.customers)||arr(d.quotes))) throw new Error('leer');
+      if(arr(d.events)) events=d.events;
+      if(arr(d.partners)) partners=d.partners;
+      if(arr(d.tasks)) tasks=d.tasks;
+      if(arr(d.fin)) fin=d.fin;
+      if(arr(d.notes)) notes=d.notes;
+      if(arr(d.customers)) customers=d.customers;
+      if(arr(d.quotes)) quotes=d.quotes;
+      if(d.company&&typeof d.company==='object') company=d.company;
       renderAll(); save(); toast('Backup importiert'); // erst rendern, dann speichern
-    }catch(x){ toast('Ungültige Datei'); } e.target.value=''; };
+    }catch{ toast('Ungültige Datei'); } e.target.value=''; };
   r.readAsText(f);
 };
 document.getElementById('changePin').onclick=()=>{ pinMode='set1'; pinBuffer='';
@@ -1220,7 +1702,8 @@ document.getElementById('logout').onclick=lock;
 /* ---------- Render all ---------- */
 function renderAll(){
   renderHome(); renderCalendar(); renderDay(); renderTasks(); renderFin();
-  renderPartners(); renderNotes(); refreshPartnerOptions(); applyFabSide();
+  renderPartners(); renderNotes(); renderCustomers(); loadCompanyForm();
+  refreshPartnerOptions(); refreshCustomerOptions(); applyFabSide();
 }
 
 /* ---------- PWA / install ---------- */
