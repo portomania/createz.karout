@@ -166,7 +166,7 @@
 
   /* Segmented control */
   .seg{display:flex;background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:14px;gap:4px}
-  .seg button{flex:1;background:none;border:0;color:var(--muted);padding:9px 4px;border-radius:9px;font-weight:700;font-size:13px}
+  .seg button{flex:1;background:none;border:0;color:var(--muted);padding:9px 2px;border-radius:9px;font-weight:700;font-size:11.5px}
   .seg button.on{background:var(--accent);color:#fff}
 
   /* Umsatz-Diagramm */
@@ -300,6 +300,7 @@
       <button data-fseg="buchungen" class="on">Buchungen</button>
       <button data-fseg="umsatz">Umsatz</button>
       <button data-fseg="angebote">Angebote</button>
+      <button data-fseg="rechnungen">Rechnungen</button>
     </div>
 
     <!-- Segment: Buchungen -->
@@ -343,6 +344,13 @@
       <h2 class="section">Angebote</h2>
       <div id="quotesList"></div>
       <button class="btn block" id="addQuote" style="margin-top:6px">+ Neues Angebot erstellen</button>
+    </div>
+
+    <!-- Segment: Rechnungen -->
+    <div id="fseg-rechnungen" class="hidden">
+      <h2 class="section">Rechnungen</h2>
+      <div id="invoicesList"></div>
+      <button class="btn block" id="addInvoice" style="margin-top:6px">+ Neue Rechnung erstellen</button>
     </div>
   </div>
 
@@ -596,7 +604,7 @@
     <datalist id="customerOptions"></datalist>
     <div class="grid2">
       <div><label class="f" for="quDate">Datum</label><input class="input" type="date" id="quDate"></div>
-      <div><label class="f" for="quValid">Gültig bis</label><input class="input" type="date" id="quValid"></div>
+      <div><label class="f" for="quValid" id="quValidLabel">Gültig bis</label><input class="input" type="date" id="quValid"></div>
     </div>
     <div class="f">Positionen</div>
     <div id="quItems"></div>
@@ -604,7 +612,7 @@
     <div class="qtotals" id="quTotals"></div>
     <div class="grid2" style="margin-top:6px">
       <div><label class="f" for="quVat">MwSt %</label><input class="input" id="quVat" inputmode="decimal" placeholder="19"></div>
-      <div><label class="f" for="quStatus">Status</label>
+      <div id="quStatusWrap"><label class="f" for="quStatus">Status</label>
         <select class="input" id="quStatus">
           <option value="offen">🟠 Offen</option><option value="angenommen">🟢 Angenommen</option><option value="abgelehnt">🔴 Abgelehnt</option>
         </select>
@@ -635,6 +643,7 @@ let fin      = DB.get('fin', []);
 let notes    = DB.get('notes', []);
 let customers= DB.get('customers', []);
 let quotes   = DB.get('quotes', []);
+let invoices = DB.get('invoices', []);
 let company  = DB.get('company', {name:'CREATEZ GmbH',addr:'',phone:'',mail:'',tax:'',vat:'19',bank:''});
 // Defekte Daten (z.B. aus fehlerhaftem Backup) dürfen die App nie dauerhaft brechen
 if(!Array.isArray(events))    events=[];
@@ -644,6 +653,7 @@ if(!Array.isArray(fin))       fin=[];
 if(!Array.isArray(notes))     notes=[];
 if(!Array.isArray(customers)) customers=[];
 if(!Array.isArray(quotes))    quotes=[];
+if(!Array.isArray(invoices))  invoices=[];
 if(!company||typeof company!=='object') company={name:'CREATEZ GmbH',vat:'19'};
 const COLORS = ['#2f80ff','#2ec16b','#f5a623','#f2545b','#a06bff','#18b6c9'];
 const PRIOC  = {hoch:'#f2545b',mittel:'#f5a623',niedrig:'#2ec16b'};
@@ -655,7 +665,7 @@ function uid(){
   const a=new Uint32Array(2); crypto.getRandomValues(a);
   return 'x'+a[0].toString(36)+a[1].toString(36)+Date.now().toString(36).slice(-3);
 }
-function save(){ DB.set('events',events); DB.set('partners',partners); DB.set('tasks',tasks); DB.set('fin',fin); DB.set('notes',notes); DB.set('customers',customers); DB.set('quotes',quotes); DB.set('company',company) }
+function save(){ DB.set('events',events); DB.set('partners',partners); DB.set('tasks',tasks); DB.set('fin',fin); DB.set('notes',notes); DB.set('customers',customers); DB.set('quotes',quotes); DB.set('invoices',invoices); DB.set('company',company) }
 function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2200) }
 const pad=n=>String(n).padStart(2,'0');
 const iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
@@ -765,7 +775,7 @@ document.getElementById('finSeg').addEventListener('click',e=>{
   const b=e.target.closest('button'); if(!b) return;
   finSeg=b.dataset.fseg;
   document.querySelectorAll('#finSeg button').forEach(x=>x.classList.toggle('on',x===b));
-  ['buchungen','umsatz','angebote'].forEach(s=>document.getElementById('fseg-'+s).classList.toggle('hidden',s!==finSeg));
+  ['buchungen','umsatz','angebote','rechnungen'].forEach(s=>document.getElementById('fseg-'+s).classList.toggle('hidden',s!==finSeg));
   renderFin();
 });
 // PWA wird auf dem Handy fortgesetzt statt neu geladen → beim Zurückkehren auffrischen
@@ -888,7 +898,11 @@ document.getElementById('fab').onclick=()=>{
   if(activeView==='home') openSheet('quickSheet');
   else if(activeView==='cal') openEvent(null);
   else if(activeView==='tasks') openTask(null);
-  else if(activeView==='fin'){ finSeg==='angebote' ? openQuote(null) : openFin(null); }
+  else if(activeView==='fin'){
+    if(finSeg==='angebote') openQuote(null);
+    else if(finSeg==='rechnungen') openQuote(null,'invoice');
+    else openFin(null);
+  }
 };
 function applyFabSide(){ document.getElementById('fab').classList.toggle('left', !!DB.get('fabLeft',false)) }
 document.getElementById('fabSide').onclick=()=>{ DB.set('fabLeft', !DB.get('fabLeft',false)); applyFabSide(); toast('Plus-Button verschoben') };
@@ -1102,10 +1116,21 @@ function finRow(f){
   el.style.cursor='pointer';
   el.onclick=e=>{
     if(e.target.closest('[data-paid]')){ return; }
-    openFin(f);
+    // Aus einer Rechnung erzeugte Buchung → im Rechnungs-Editor öffnen (eine Quelle der Wahrheit)
+    const linkedInv=f.invoiceId?invoices.find(v=>v.id===f.invoiceId):null;
+    if(linkedInv) openQuote(linkedInv);
+    else openFin(f);
   };
   const pb=el.querySelector('[data-paid]');
-  if(pb) pb.onclick=e=>{ e.stopPropagation(); f.paid=!f.paid; save(); renderFin(); renderHome(); toast(f.paid?'Als bezahlt markiert ✅':'Als offen markiert'); };
+  if(pb) pb.onclick=e=>{
+    e.stopPropagation();
+    f.paid=!f.paid;
+    // Bezahlt-Status zur verknüpften Rechnung spiegeln
+    const linkedInv=f.invoiceId?invoices.find(v=>v.id===f.invoiceId):null;
+    if(linkedInv) linkedInv.paid=f.paid;
+    save(); renderFin(); renderHome();
+    toast(f.paid?'Als bezahlt markiert ✅':'Als offen markiert');
+  };
   return el;
 }
 document.querySelectorAll('[data-ffilter]').forEach(b=>b.onclick=()=>{
@@ -1134,6 +1159,7 @@ function renderFin(){
 
   renderChart();
   renderQuotes();
+  renderInvoices();
 }
 
 /* ---------- Umsatz-Diagramm (SVG, ohne externe Bibliothek) ---------- */
@@ -1251,6 +1277,15 @@ function nextQuoteNo(){
   const n=quotes.filter(q=>q.number&&q.number.includes('-'+y+'-')).length+1;
   return 'ANG-'+y+'-'+pad(n);
 }
+function nextInvoiceNo(){
+  const y=new Date().getFullYear();
+  const n=invoices.filter(v=>v.number&&v.number.includes('-'+y+'-')).length+1;
+  return 'RE-'+y+'-'+pad(n);
+}
+function plusDays(days){
+  const d=new Date(); d.setDate(d.getDate()+days);
+  return iso(d);
+}
 function renderQuotes(){
   const box=document.getElementById('quotesList'); box.innerHTML='';
   if(!quotes.length){ box.innerHTML='<div class="empty">Noch keine Angebote.</div>'; return }
@@ -1271,11 +1306,56 @@ function renderQuotes(){
         <button class="chip" data-edit>✏️ Bearbeiten</button>
         <button class="chip" data-inv>🧾 Als Rechnung</button>
       </div>`;
-    el.querySelector('[data-pdf]').onclick=()=>printQuote(q);
+    el.querySelector('[data-pdf]').onclick=()=>printDoc(q);
     el.querySelector('[data-edit]').onclick=()=>openQuote(q);
     el.querySelector('[data-inv]').onclick=()=>quoteToInvoice(q);
     box.appendChild(el);
   });
+}
+function renderInvoices(){
+  const box=document.getElementById('invoicesList'); box.innerHTML='';
+  if(!invoices.length){ box.innerHTML='<div class="empty">Noch keine Rechnungen.<br>Aus einem Angebot erzeugen oder mit ＋ erstellen.</div>'; return }
+  const today=iso(new Date());
+  [...invoices].sort((a,b)=>(b.date||'').localeCompare(a.date||'')).forEach(v=>{
+    const overdue=!v.paid&&v.valid&&v.valid<today;
+    const el=document.createElement('div'); el.className='card'; el.style.marginBottom='10px';
+    let dueLine='';
+    if(v.valid){
+      const warn=overdue?'⚠️ überfällig seit ':'fällig ';
+      dueLine=`<div class="meta" style="font-size:12px;${overdue?'color:var(--danger)':''}">${warn}${fmtShort(v.valid)}</div>`;
+    }
+    let badgeCls='st-offen';
+    if(v.paid) badgeCls='st-angenommen';
+    else if(overdue) badgeCls='st-abgelehnt';
+    const badgeTxt=v.paid?'Bezahlt':'Offen';
+    el.innerHTML=`<div class="row" style="justify-content:space-between">
+        <div style="min-width:0"><b>${esc(v.number||'Rechnung')}</b>
+          <div class="meta" style="font-size:13px">${esc(v.customer||'—')} · ${v.date?fmtShort(v.date):''}</div>
+          ${dueLine}
+        </div>
+        <button class="badge-status ${badgeCls}" data-paid style="border:0;cursor:pointer">${badgeTxt}</button>
+      </div>
+      <div class="row" style="justify-content:space-between;margin-top:8px">
+        <span class="amount ${v.paid?'plus':'open'}">${eur(quoteGross(v))}</span>
+        ${v.quoteRef?`<span class="meta" style="font-size:12px">aus ${esc(v.quoteRef)}</span>`:''}
+      </div>
+      <div class="acts" style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+        <button class="chip share" data-pdf>🖨 PDF / Drucken</button>
+        <button class="chip" data-edit>✏️ Bearbeiten</button>
+      </div>`;
+    el.querySelector('[data-paid]').onclick=()=>setInvoicePaid(v,!v.paid);
+    el.querySelector('[data-pdf]').onclick=()=>printDoc(v);
+    el.querySelector('[data-edit]').onclick=()=>openQuote(v);
+    box.appendChild(el);
+  });
+}
+// Bezahlt-Status der Rechnung und der verknüpften Finanz-Buchung synchron halten
+function setInvoicePaid(v,paid){
+  v.paid=paid;
+  const linked=fin.find(f=>f.invoiceId===v.id);
+  if(linked) linked.paid=paid;
+  save(); renderFin(); renderHome();
+  toast(paid?'Als bezahlt markiert ✅':'Als offen markiert');
 }
 function renderQItems(){
   const box=document.getElementById('quItems'); box.innerHTML='';
@@ -1303,14 +1383,26 @@ function updateQTotals(){
      <div class="r"><span>MwSt (${vat}%)</span><b>${eur(tax)}</b></div>
      <div class="r big"><span>Gesamt</span><span>${eur(net+tax)}</span></div>`;
 }
-function openQuote(q){
+// Ein Sheet für beide Dokumentarten: Angebot (Standard) und Rechnung (kind:'invoice')
+let quoteDocMode='quote';
+function openQuote(q,mode){
   editingQ=q||null;
-  document.getElementById('quSheetTitle').textContent=q?'Angebot bearbeiten':'Neues Angebot';
+  const kindSource = q ? q.kind : mode;
+  quoteDocMode = kindSource==='invoice' ? 'invoice' : 'quote';
+  const isInv = quoteDocMode==='invoice';
+  let title='Neues Angebot';
+  if(q) title=isInv?'Rechnung bearbeiten':'Angebot bearbeiten';
+  else if(isInv) title='Neue Rechnung';
+  document.getElementById('quSheetTitle').textContent=title;
+  document.getElementById('quValidLabel').textContent=isInv?'Fällig am':'Gültig bis';
+  document.getElementById('quStatusWrap').style.display=isInv?'none':'block';
   document.getElementById('quCustomer').value=q?.customer||'';
   document.getElementById('quDate').value=q?.date||iso(new Date());
-  document.getElementById('quValid').value=q?.valid||'';
+  let validDefault='';
+  if(!q&&isInv) validDefault=plusDays(14); // Zahlungsziel 14 Tage
+  document.getElementById('quValid').value=q?.valid||validDefault;
   document.getElementById('quVat').value=(q?q.vat:company.vat)||'19';
-  document.getElementById('quStatus').value=q?.status||'offen';
+  document.getElementById('quStatus').value=(!isInv&&q?.status)||'offen';
   document.getElementById('quNote').value=q?.note||'';
   qItems=q?JSON.parse(JSON.stringify(q.items||[])):[{desc:'',qty:1,price:0}];
   if(!qItems.length) qItems=[{desc:'',qty:1,price:0}];
@@ -1319,37 +1411,74 @@ function openQuote(q){
   openSheet('quoteSheet');
 }
 document.getElementById('addQuote').onclick=()=>openQuote(null);
+document.getElementById('addInvoice').onclick=()=>openQuote(null,'invoice');
 document.getElementById('quAddItem').onclick=()=>{ qItems.push({desc:'',qty:1,price:0}); renderQItems(); updateQTotals(); };
 document.getElementById('quVat').oninput=updateQTotals;
+// Verknüpfte Finanz-Buchung einer Rechnung anlegen bzw. aktuell halten
+function syncInvoiceFin(v){
+  const label=(v.number?v.number+' · ':'')+(v.customer||'Rechnung');
+  const amount=Math.round(quoteGross(v)*100)/100;
+  let linked=fin.find(f=>f.invoiceId===v.id);
+  if(!linked){
+    linked={id:uid(),type:'rechnung',invoiceId:v.id,paid:!!v.paid};
+    fin.push(linked);
+  }
+  linked.label=label; linked.amount=amount; linked.date=v.date; linked.paid=!!v.paid;
+}
 document.getElementById('quSave').onclick=()=>{
   const customer=document.getElementById('quCustomer').value.trim();
   const items=qItems.filter(it=>(it.desc||'').trim()||Number(it.price)>0);
   if(!customer){ toast('Bitte Kunde angeben'); return }
   if(!items.length){ toast('Mindestens eine Position'); return }
+  const isInv=quoteDocMode==='invoice';
   const data={customer,date:document.getElementById('quDate').value||iso(new Date()),
     valid:document.getElementById('quValid').value,
     vat:parseAmount(document.getElementById('quVat').value)||0,
-    status:document.getElementById('quStatus').value,
     note:document.getElementById('quNote').value.trim(),
     items:items.map(it=>({desc:(it.desc||'').trim(),qty:Number(it.qty)||0,price:Number(it.price)||0}))};
-  if(editingQ) Object.assign(editingQ,data);
-  else { data.id=uid(); data.number=nextQuoteNo(); quotes.push(data); }
-  save(); closeSheet('quoteSheet'); renderFin(); toast('Angebot gespeichert');
+  if(!isInv) data.status=document.getElementById('quStatus').value;
+  let doc=editingQ;
+  if(doc) Object.assign(doc,data);
+  else if(isInv){
+    doc={...data,id:uid(),kind:'invoice',number:nextInvoiceNo(),paid:false};
+    invoices.push(doc);
+  } else {
+    doc={...data,id:uid(),number:nextQuoteNo()};
+    quotes.push(doc);
+  }
+  if(doc.kind==='invoice') syncInvoiceFin(doc);
+  save(); closeSheet('quoteSheet'); renderFin(); renderHome();
+  toast(isInv?'Rechnung gespeichert':'Angebot gespeichert');
 };
 document.getElementById('quDelete').onclick=()=>{
-  if(editingQ&&confirm('Angebot löschen?')){ quotes=quotes.filter(x=>x!==editingQ); save(); closeSheet('quoteSheet'); renderFin(); }
+  if(!editingQ) return;
+  const isInv=editingQ.kind==='invoice';
+  if(!confirm(isInv?'Rechnung löschen? (inkl. Finanz-Buchung)':'Angebot löschen?')) return;
+  if(isInv){
+    fin=fin.filter(f=>f.invoiceId!==editingQ.id);
+    invoices=invoices.filter(x=>x!==editingQ);
+  } else {
+    quotes=quotes.filter(x=>x!==editingQ);
+  }
+  save(); closeSheet('quoteSheet'); renderFin(); renderHome();
 };
 document.getElementById('quClose').onclick=()=>closeSheet('quoteSheet');
 
 function quoteToInvoice(q){
-  if(!confirm('Angebot '+(q.number||'')+' als offene Rechnung in die Finanzen übernehmen?')) return;
-  fin.push({id:uid(),type:'rechnung',label:(q.number?q.number+' · ':'')+(q.customer||'Angebot'),
-    amount:Math.round(quoteGross(q)*100)/100,date:iso(new Date()),paid:false});
-  save(); toast('Als Rechnung übernommen'); renderHome();
+  if(!confirm('Aus Angebot '+(q.number||'')+' eine Rechnung erstellen?')) return;
+  const v={id:uid(),kind:'invoice',number:nextInvoiceNo(),customer:q.customer,
+    date:iso(new Date()),valid:plusDays(14),vat:q.vat,note:q.note||'',
+    items:JSON.parse(JSON.stringify(q.items||[])),quoteRef:q.number||'',paid:false};
+  invoices.push(v);
+  syncInvoiceFin(v);
+  save(); renderFin(); renderHome();
+  toast('Rechnung '+v.number+' erstellt 🧾');
 }
 
-/* PDF: sauberes Druck-Layout → Browser „Drucken → Als PDF speichern" (offline, ohne Bibliothek) */
-function printQuote(q){
+/* PDF: sauberes Druck-Layout → Browser „Drucken → Als PDF speichern" (offline, ohne Bibliothek)
+   Rendert Angebote UND Rechnungen (doc.kind==='invoice') mit demselben Briefkopf. */
+function printDoc(q){
+  const isInv=q.kind==='invoice';
   const net=quoteNet(q),tax=quoteTax(q),gross=quoteGross(q);
   const rows=(q.items||[]).map(it=>{
     const line=(Number(it.qty)||0)*(Number(it.price)||0);
@@ -1363,6 +1492,18 @@ function printQuote(q){
     const addrLines=cust.addr?esc(cust.addr).replace(/\n/g,'<br>'):'';
     custBlock=`<b>${esc(cust.name)}</b><br>${contactLine}${addrLines}`;
   }
+  const heading=isInv?'RECHNUNG':'ANGEBOT';
+  const dateLabel=isInv?'Rechnungsdatum':'Datum';
+  const validLabel=isInv?'Fällig bis':'Gültig bis';
+  const addressee=isInv?'Rechnung an:':'Angebot an:';
+  let footerText='Dieses Angebot ist freibleibend. Vielen Dank für Ihr Interesse.';
+  if(isInv){
+    const due=q.valid?(' bis zum '+fmtShort(q.valid)):'';
+    footerText=company.bank
+      ? 'Bitte überweisen Sie den Gesamtbetrag'+due+' auf folgendes Konto: '+company.bank+'. Vielen Dank für Ihren Auftrag.'
+      : 'Zahlbar'+(due||' nach Erhalt')+'. Vielen Dank für Ihren Auftrag.';
+  }
+  const refLine=(isInv&&q.quoteRef)?`<div>Basis: Angebot ${esc(q.quoteRef)}</div>`:'';
   document.getElementById('printArea').innerHTML=`
     <div class="doc">
       <div class="hd">
@@ -1370,13 +1511,14 @@ function printQuote(q){
           <div style="font-size:11px;color:#555;white-space:pre-line;margin-top:4px">${esc([company.addr,company.phone,company.mail].filter(Boolean).join('\n'))}</div>
         </div>
         <div style="text-align:right;font-size:12px">
-          <div style="font-size:18px;font-weight:800;color:#2f80ff">ANGEBOT</div>
+          <div style="font-size:18px;font-weight:800;color:#2f80ff">${heading}</div>
           <div style="margin-top:4px">${esc(q.number||'')}</div>
-          <div>Datum: ${q.date?fmtShort(q.date):''}</div>
-          ${q.valid?`<div>Gültig bis: ${fmtShort(q.valid)}</div>`:''}
+          <div>${dateLabel}: ${q.date?fmtShort(q.date):''}</div>
+          ${q.valid?`<div>${validLabel}: ${fmtShort(q.valid)}</div>`:''}
+          ${refLine}
         </div>
       </div>
-      <div style="margin-top:18px"><div style="font-size:11px;color:#777">Angebot an:</div>${custBlock}</div>
+      <div style="margin-top:18px"><div style="font-size:11px;color:#777">${addressee}</div>${custBlock}</div>
       <table>
         <thead><tr><th>Beschreibung</th><th class="num">Menge</th><th class="num">Einzelpreis</th><th class="num">Betrag</th></tr></thead>
         <tbody>${rows}</tbody>
@@ -1389,11 +1531,12 @@ function printQuote(q){
       ${q.note?`<div style="margin-top:18px;white-space:pre-line">${esc(q.note)}</div>`:''}
       <div class="ft">
         ${esc([company.tax?('USt-IdNr.: '+company.tax):'',company.bank?('Bank: '+company.bank):''].filter(Boolean).join(' · '))}
-        <br>Dieses Angebot ist freibleibend. Vielen Dank für Ihr Interesse.
+        <br>${esc(footerText)}
       </div>
     </div>`;
   const title=document.title;
-  document.title=(q.number||'Angebot')+'_'+(q.customer||'').replace(/\s+/g,'_');
+  const fallbackName=isInv?'Rechnung':'Angebot';
+  document.title=(q.number||fallbackName)+'_'+(q.customer||'').replace(/\s+/g,'_');
   setTimeout(()=>{ window.print(); document.title=title; }, 60);
 }
 function openFin(f){
@@ -1671,7 +1814,7 @@ function importIcs(text){
   });
   save(); renderAll(); toast(n+' Termine importiert');
 }
-document.getElementById('exportJson').onclick=()=>downloadFile('createz_backup.json', JSON.stringify({events,partners,tasks,fin,notes,customers,quotes,company},null,2),'application/json');
+document.getElementById('exportJson').onclick=()=>downloadFile('createz_backup.json', JSON.stringify({events,partners,tasks,fin,notes,customers,quotes,invoices,company},null,2),'application/json');
 document.getElementById('importJson').onclick=()=>document.getElementById('jsonFile').click();
 document.getElementById('jsonFile').onchange=e=>{
   const f=e.target.files[0];
@@ -1688,6 +1831,7 @@ document.getElementById('jsonFile').onchange=e=>{
       if(arr(d.notes)) notes=d.notes;
       if(arr(d.customers)) customers=d.customers;
       if(arr(d.quotes)) quotes=d.quotes;
+      if(arr(d.invoices)) invoices=d.invoices;
       if(d.company&&typeof d.company==='object') company=d.company;
       renderAll(); save(); toast('Backup importiert'); // erst rendern, dann speichern
     }catch{ toast('Ungültige Datei'); } e.target.value=''; };
