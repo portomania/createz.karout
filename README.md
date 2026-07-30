@@ -30,3 +30,21 @@ GitHub Pages aktivieren (Settings → Pages → Branch `main`), dann
 `https://<user>.github.io/<repo>/app.html` am Handy öffnen →
 „Zum Startbildschirm hinzufügen". Alle Daten bleiben lokal auf dem Gerät;
 Backup über Mehr → Daten → JSON-Export.
+
+## Admin-Zugang (PIN)
+
+Die App hat kein Server-Backend und keine Benutzerverwaltung: Nach Eingabe der
+PIN stehen **alle Module uneingeschränkt** zur Verfügung — es gibt keine
+eingeschränkten Rollen.
+
+- Erst-PIN: **1234** – gilt **pro Gerät/Browser** (die PIN wird lokal auf dem
+  Gerät gespeichert, nicht auf einem Server). Auf einem neuen Gerät gilt also
+  wieder die Erst-PIN.
+- PIN ändern: in der App unter „Mehr" → „PIN ändern".
+- PIN vergessen: auf dem Login-Bildschirm „PIN vergessen?" antippen – die PIN
+  wird zurückgesetzt und direkt eine neue festgelegt. Alle Daten (Events, Crew,
+  Material, Finanzen, Kunden, Rechnungen …) bleiben dabei erhalten.
+
+Da alle Daten lokal auf dem Gerät liegen, sieht jedes Gerät seinen eigenen
+Datenstand. Für denselben Stand auf mehreren Geräten: Backup über
+„Mehr → Daten → JSON-Export" und auf dem anderen Gerät importieren.
