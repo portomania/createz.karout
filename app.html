@@ -217,7 +217,8 @@
   <div class="muted" style="font-size:13px" id="loginSub">Geschäftsführer-Zugang · PIN eingeben</div>
   <div class="pin" id="pinDots"></div>
   <div class="keys" id="keys"></div>
-  <div class="muted" id="pinHint" style="font-size:12px;margin-top:18px">Erst-PIN: <b>1234</b> · danach unter „Mehr" änderbar</div>
+  <div class="muted" id="pinHint" style="font-size:12px;margin-top:18px">Erst-PIN: <b>1234</b> · gilt pro Gerät/Browser · danach unter „Mehr" änderbar</div>
+  <button class="btn ghost" id="pinForgot" style="margin-top:18px;min-width:200px">PIN vergessen?</button>
   <button class="btn ghost hidden" id="pinCancel" style="margin-top:18px;min-width:200px">Abbrechen</button>
 </div>
 
@@ -744,6 +745,16 @@ function enterApp(){
 }
 // PIN-Änderung abbrechen → zurück in die App (nur erreichbar, wenn eingeloggt)
 document.getElementById('pinCancel').onclick=()=>{ pinMode='login'; pinBuffer=''; renderDots(); enterApp(); };
+// PIN vergessen → PIN zurücksetzen und neue PIN festlegen (Daten bleiben erhalten)
+document.getElementById('pinForgot').onclick=()=>{
+  if(!confirm('PIN zurücksetzen?\n\nAlle Daten (Termine, Aufgaben, Finanzen, Kunden …) bleiben erhalten. Du legst direkt danach eine neue PIN fest.')) return;
+  localStorage.removeItem('cz_pinHash');
+  pinMode='set1'; pinBuffer='';
+  document.getElementById('loginSub').textContent='Geschäftsführer-Zugang · Neue PIN festlegen';
+  document.getElementById('pinHint').classList.add('hidden');
+  document.getElementById('pinForgot').classList.add('hidden');
+  renderDots();
+};
 function lock(){
   document.getElementById('app').classList.add('hidden');
   document.getElementById('login').classList.remove('hidden');
@@ -751,6 +762,7 @@ function lock(){
   document.getElementById('loginSub').textContent='Geschäftsführer-Zugang · PIN eingeben';
   document.getElementById('pinHint').classList.toggle('hidden', !!DB.get('pinHash',null));
   document.getElementById('pinCancel').classList.add('hidden');
+  document.getElementById('pinForgot').classList.remove('hidden');
   renderDots();
 }
 
@@ -1840,6 +1852,7 @@ document.getElementById('jsonFile').onchange=e=>{
 document.getElementById('changePin').onclick=()=>{ pinMode='set1'; pinBuffer='';
   document.getElementById('app').classList.add('hidden'); document.getElementById('login').classList.remove('hidden');
   document.getElementById('loginSub').textContent='Geschäftsführer-Zugang · Neue PIN'; document.getElementById('pinHint').classList.add('hidden');
+  document.getElementById('pinForgot').classList.add('hidden');
   document.getElementById('pinCancel').classList.remove('hidden'); renderDots(); };
 document.getElementById('logout').onclick=lock;
 
