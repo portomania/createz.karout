@@ -1,6 +1,6 @@
 /* CREATEZ Superadmin Portal – Service Worker
    Ermöglicht Installation "Zum Startbildschirm hinzufügen" und Offline-Betrieb. */
-const CACHE = 'createz-portal-v5';
+const CACHE = 'createz-portal-v6';
 const ASSETS = [
   './app.html',
   './manifest.webmanifest',

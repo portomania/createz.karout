@@ -10,7 +10,7 @@
 <link rel="apple-touch-icon" href="./icon.svg">
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
 <link rel="manifest" href="./manifest.webmanifest">
-<title>CREATEZ – Geschäftsführer Cockpit</title>
+<title>CREATEZ – Event Control Center</title>
 <style>
   :root{
     --bg:#111418; --surface:#181d24; --surface2:#1f2731; --line:#2a333f;
@@ -213,7 +213,7 @@
 <!-- LOGIN -->
 <div class="login" id="login">
   <div class="logo">CZ</div>
-  <div style="font-size:20px;font-weight:800">CREATEZ Cockpit</div>
+  <div style="font-size:20px;font-weight:800">CREATEZ Control Center</div>
   <div class="muted" style="font-size:13px" id="loginSub">Geschäftsführer-Zugang · PIN eingeben</div>
   <div class="pin" id="pinDots"></div>
   <div class="keys" id="keys"></div>
@@ -225,8 +225,8 @@
 <div class="app hidden" id="app">
   <div class="topbar">
     <div class="logo">CZ</div>
-    <div class="brand"><b>CREATEZ</b><small>GmbH · Geschäftsführer-Cockpit</small></div>
-    <span class="badge">GESCHÄFTSFÜHRER</span>
+    <div class="brand"><b>CREATEZ</b><small>GmbH · Event Services</small></div>
+    <span class="badge">CONTROL CENTER</span>
   </div>
 
   <!-- HEUTE / COCKPIT -->
@@ -243,7 +243,7 @@
     <div class="next-ev" id="nextEvCard"></div>
 
     <div class="row" style="gap:10px">
-      <div class="stat"><div class="n" id="stToday">0</div><div class="l">Einsätze heute</div></div>
+      <div class="stat"><div class="n" id="stToday">0</div><div class="l">Events heute</div></div>
       <div class="stat"><div class="n" id="stTasks">0</div><div class="l">Offene Aufgaben</div></div>
       <div class="stat"><div class="n money" id="stOffen" style="color:var(--warn)">0 €</div><div class="l">Rechnungen offen</div></div>
     </div>
@@ -253,7 +253,7 @@
 
     <h2 class="section">Schnellaktionen</h2>
     <div class="qa">
-      <button id="qaEvent"><span class="ico">📦</span>Neuer Einsatz</button>
+      <button id="qaEvent"><span class="ico">🎪</span>Neues Event</button>
       <button id="qaTask"><span class="ico">✅</span>Neue Aufgabe</button>
       <button id="qaFin"><span class="ico">💶</span>Neue Buchung</button>
       <button id="qaNote"><span class="ico">📝</span>Neue Notiz</button>
@@ -363,13 +363,26 @@
     <div id="customersList"></div>
     <button class="btn block" id="addCustomer">+ Kunde hinzufügen</button>
 
+    <h2 class="section">📢 Ausschreibungen</h2>
+    <div id="tendersList"></div>
+    <button class="btn block" id="addTender">+ Ausschreibung erfassen</button>
+
+    <h2 class="section">👷 Crew &amp; Personal</h2>
+    <div id="driversList"></div>
+    <button class="btn block" id="addDriver">+ Crew-Mitglied hinzufügen</button>
+
+    <h2 class="section">📦 Material &amp; Verleih</h2>
+    <div id="stockList"></div>
+    <button class="btn block" id="addStock">+ Material hinzufügen</button>
+
+    <h2 class="section">⭐ Regelwerk &amp; Qualitätsstandards</h2>
+    <div class="muted" style="font-size:13px;margin:0 2px 8px">Checklisten-Vorlagen — bei wiederkehrenden Events wird jedes Event gleich. Im Event auswählen, vor Ort abhaken, als Report-PDF dokumentieren.</div>
+    <div id="templatesList"></div>
+    <button class="btn block" id="addTemplate">+ Standard / Checkliste anlegen</button>
+
     <h2 class="section">🚚 Fuhrpark</h2>
     <div id="fleetList"></div>
     <button class="btn block" id="addVehicle">+ Fahrzeug hinzufügen</button>
-
-    <h2 class="section">🧑‍✈️ Fahrer</h2>
-    <div id="driversList"></div>
-    <button class="btn block" id="addDriver">+ Fahrer hinzufügen</button>
 
     <h2 class="section">📋 Pflichttermine (Steuern &amp; Abgaben)</h2>
     <div class="card">
@@ -379,7 +392,7 @@
 
     <h2 class="section">Firmendaten (für Angebote)</h2>
     <div class="card">
-      <div class="muted" style="font-size:13px;margin-bottom:10px">Erscheinen im Briefkopf der Angebots-PDF.</div>
+      <div class="muted" style="font-size:13px;margin-bottom:10px">Erscheinen im Briefkopf aller PDFs (Angebote, Rechnungen, Reports, Setcards).</div>
       <label class="f" for="coName" style="margin-top:0">Firmenname</label>
       <input class="input" id="coName" placeholder="CREATEZ GmbH">
       <label class="f" for="coAddr">Anschrift</label>
@@ -401,7 +414,7 @@
     <div id="notesList"></div>
     <button class="btn ghost block" id="addNote">+ Notiz hinzufügen</button>
 
-    <h2 class="section">Einsatzpartner</h2>
+    <h2 class="section">🕸 Partner-Netzwerk (Security, Hostessen, Technik …)</h2>
     <div id="partnersList"></div>
     <button class="btn ghost block" id="addPartner" style="margin-top:8px">+ Partner hinzufügen</button>
 
@@ -433,7 +446,7 @@
       <button class="btn ghost block" id="changePin">🔒 PIN ändern</button>
       <button class="btn danger block" id="logout" style="margin-top:10px">Abmelden</button>
     </div>
-    <div class="muted" style="font-size:11px;text-align:center;margin-top:20px">CREATEZ GmbH · Geschäftsführer-Cockpit · Daten lokal auf diesem Gerät</div>
+    <div class="muted" style="font-size:11px;text-align:center;margin-top:20px">CREATEZ GmbH · Event Control Center · Daten lokal auf diesem Gerät</div>
   </div>
 
   <!-- NAV -->
@@ -459,7 +472,7 @@
     <div class="grab"></div>
     <div class="sheet-title">Schnell hinzufügen</div>
     <div class="qa" style="margin-top:10px">
-      <button id="qEvent"><span class="ico">📦</span>Einsatz</button>
+      <button id="qEvent"><span class="ico">🎪</span>Event</button>
       <button id="qTask"><span class="ico">✅</span>Aufgabe</button>
       <button id="qFin"><span class="ico">💶</span>Buchung</button>
       <button id="qQuote"><span class="ico">📄</span>Angebot</button>
@@ -474,14 +487,14 @@
 <div class="sheet-bg" id="eventSheet">
   <div class="sheet">
     <div class="grab"></div>
-    <div class="sheet-title" id="sheetTitle">Neuer Einsatz</div>
+    <div class="sheet-title" id="sheetTitle">Neues Event</div>
     <label class="f" for="fTitle">Titel</label>
-    <input class="input" id="fTitle" placeholder="z.B. Kurierfahrt München → Augsburg">
+    <input class="input" id="fTitle" placeholder="z.B. Messebau Halle A4 · Trixe">
     <div class="grid2">
       <div><label class="f" for="fDate">Datum</label><input class="input" type="date" id="fDate"></div>
       <div><label class="f" for="fType">Typ</label>
         <select class="input" id="fType">
-          <option>Transport</option><option>Kurier</option><option>Termin</option><option>Bereitschaft</option>
+          <option>Aufbau</option><option>Durchführung</option><option>Abbau</option><option>Messebau</option><option>Verleih</option><option>Personalgestellung</option><option>Besichtigung</option><option>Termin</option>
         </select>
       </div>
     </div>
@@ -489,13 +502,15 @@
       <div><label class="f" for="fStart">Von</label><input class="input" type="time" id="fStart"></div>
       <div><label class="f" for="fEnd">Bis</label><input class="input" type="time" id="fEnd"></div>
     </div>
-    <label class="f" for="fLoc">Ort / Route</label>
-    <input class="input" id="fLoc" placeholder="Abhol- / Zielort">
-    <label class="f" for="fPartner">Partner / Fahrer</label>
-    <input class="input" id="fPartner" placeholder="z.B. Fahrer / Subunternehmer" list="partnerOptions">
+    <label class="f" for="fLoc">Ort / Venue</label>
+    <input class="input" id="fLoc" placeholder="Halle, Location, Adresse">
+    <label class="f" for="fPartner">Kunde / Partner</label>
+    <input class="input" id="fPartner" placeholder="z.B. Auftraggeber / Gewerk" list="partnerOptions">
     <datalist id="partnerOptions"></datalist>
     <label class="f" for="fNote">Notiz</label>
-    <textarea class="input" id="fNote" placeholder="Details, Kontakt, Ladung …"></textarea>
+    <textarea class="input" id="fNote" placeholder="Details, Ansprechpartner, Technik …"></textarea>
+    <label class="f" for="fQs">⭐ Qualitätsstandard (Checkliste)</label>
+    <select class="input" id="fQs"><option value="">— keiner —</option></select>
     <div class="f">Farbe</div>
     <div class="colors" id="colors"></div>
     <button class="btn ok block" id="saveEvent" style="margin-top:20px">Speichern</button>
@@ -566,7 +581,7 @@
 <div class="sheet-bg" id="shareSheet">
   <div class="sheet">
     <div class="grab"></div>
-    <div class="sheet-title">Einsatz teilen</div>
+    <div class="sheet-title">Event teilen</div>
     <div class="muted" id="sharePreview" style="font-size:13px;margin:4px 2px 16px"></div>
     <button class="btn block" id="shShare">📤 Teilen (Handy-Menü)</button>
     <button class="btn ghost block" id="shWa" style="margin-top:10px">💬 Per WhatsApp senden</button>
@@ -582,9 +597,9 @@
   <div class="sheet">
     <div class="grab"></div>
     <div class="sheet-title" id="pSheetTitle">Partner</div>
-    <label class="f" for="pName">Name</label><input class="input" id="pName" placeholder="Firma / Fahrer">
+    <label class="f" for="pName">Name</label><input class="input" id="pName" placeholder="Firma / Person">
     <label class="f" for="pPhone">Telefon</label><input class="input" id="pPhone" placeholder="+49 …" type="tel">
-    <label class="f" for="pNote">Notiz</label><input class="input" id="pNote" placeholder="Fahrzeug, Verfügbarkeit …">
+    <label class="f" for="pNote">Gewerk / Notiz</label><input class="input" id="pNote" placeholder="z.B. Security, Hostess, Rigging, Catering …">
     <button class="btn ok block" id="pSave" style="margin-top:18px">Speichern</button>
     <button class="btn danger block hidden" id="pDelete" style="margin-top:10px">Löschen</button>
     <button class="btn ghost block" id="pClose" style="margin-top:10px">Abbrechen</button>
@@ -629,21 +644,106 @@
   </div>
 </div>
 
-<!-- Sheet: Fahrer -->
+<!-- Sheet: Crew-Mitglied -->
 <div class="sheet-bg" id="driverSheet">
   <div class="sheet">
     <div class="grab"></div>
-    <div class="sheet-title" id="drSheetTitle">Fahrer</div>
+    <div class="sheet-title" id="drSheetTitle">Crew-Mitglied</div>
     <label class="f" for="drName">Name</label><input class="input" id="drName" placeholder="Vor- und Nachname">
-    <label class="f" for="drPhone">Telefon</label><input class="input" id="drPhone" type="tel" placeholder="+49 …">
     <div class="grid2">
-      <div><label class="f" for="drLicense">Führerschein-Kontrolle am</label><input class="input" type="date" id="drLicense"></div>
-      <div><label class="f" for="drModul">Modul 95 gültig bis</label><input class="input" type="date" id="drModul"></div>
+      <div><label class="f" for="drRole">Rolle</label>
+        <select class="input" id="drRole">
+          <option>Stagehand</option><option>Teamleiter</option><option>Rigger</option><option>Techniker</option>
+          <option>Messebauer</option><option>Hostess/Host</option><option>Security</option><option>Fahrer</option><option>Allrounder</option>
+        </select>
+      </div>
+      <div><label class="f" for="drRate">Stundensatz €</label><input class="input" id="drRate" inputmode="decimal" placeholder="z.B. 45"></div>
     </div>
-    <label class="f" for="drNote">Notiz</label><input class="input" id="drNote" placeholder="ADR-Schein, Fahrerkarte …">
+    <label class="f" for="drPhone">Telefon</label><input class="input" id="drPhone" type="tel" placeholder="+49 …">
+    <label class="f" for="drSkills">Skills</label><input class="input" id="drSkills" placeholder="Stapler, Kettenzug, Englisch, PSAgA …">
+    <div class="grid2">
+      <div><label class="f" for="drCert">Zertifikat / Nachweis</label><input class="input" id="drCert" placeholder="z.B. Staplerschein, SCC"></div>
+      <div><label class="f" for="drCertDate">Gültig bis</label><input class="input" type="date" id="drCertDate"></div>
+    </div>
+    <label class="f" for="drNote">Notiz</label><input class="input" id="drNote" placeholder="Verfügbarkeit, Größe für Messeoutfit …">
     <button class="btn ok block" id="drSave" style="margin-top:16px">Speichern</button>
+    <button class="btn ghost block" id="drSetcard" style="margin-top:10px">📇 Setcard als PDF</button>
     <button class="btn danger block hidden" id="drDelete" style="margin-top:10px">Löschen</button>
     <button class="btn ghost block" id="drClose" style="margin-top:10px">Abbrechen</button>
+  </div>
+</div>
+
+<!-- Sheet: Material -->
+<div class="sheet-bg" id="stockSheet">
+  <div class="sheet">
+    <div class="grab"></div>
+    <div class="sheet-title" id="stSheetTitle">Material</div>
+    <label class="f" for="stName">Bezeichnung</label><input class="input" id="stName" placeholder="z.B. Traverse 3m, Funkgerät, Theke">
+    <div class="grid2">
+      <div><label class="f" for="stQty">Bestand (Stück)</label><input class="input" id="stQty" inputmode="numeric" placeholder="z.B. 12"></div>
+      <div><label class="f" for="stRate">Tagessatz €</label><input class="input" id="stRate" inputmode="decimal" placeholder="z.B. 15"></div>
+    </div>
+    <div class="grid2">
+      <div><label class="f" for="stLentTo">Verliehen an</label><input class="input" id="stLentTo" placeholder="leer = im Lager"></div>
+      <div><label class="f" for="stLentUntil">Rückgabe bis</label><input class="input" type="date" id="stLentUntil"></div>
+    </div>
+    <label class="f" for="stNote">Notiz</label><input class="input" id="stNote" placeholder="Zustand, Lagerplatz, Seriennummer …">
+    <button class="btn ok block" id="stSave" style="margin-top:16px">Speichern</button>
+    <button class="btn danger block hidden" id="stDelete" style="margin-top:10px">Löschen</button>
+    <button class="btn ghost block" id="stClose" style="margin-top:10px">Abbrechen</button>
+  </div>
+</div>
+
+<!-- Sheet: Qualitätsstandard-Vorlage -->
+<div class="sheet-bg" id="templateSheet">
+  <div class="sheet">
+    <div class="grab"></div>
+    <div class="sheet-title" id="tpSheetTitle">Qualitätsstandard</div>
+    <label class="f" for="tpName">Name der Vorlage</label><input class="input" id="tpName" placeholder="z.B. CREATEZ Standard Messebau">
+    <label class="f" for="tpItems">Checkpunkte (einer pro Zeile)</label>
+    <textarea class="input" id="tpItems" style="min-height:150px" placeholder="Fläche eingemessen &amp; markiert&#10;Traversen/Rigging geprüft&#10;Kabelwege gesichert&#10;…"></textarea>
+    <button class="btn ok block" id="tpSave" style="margin-top:16px">Speichern</button>
+    <button class="btn danger block hidden" id="tpDelete" style="margin-top:10px">Löschen</button>
+    <button class="btn ghost block" id="tpClose" style="margin-top:10px">Abbrechen</button>
+  </div>
+</div>
+
+<!-- Sheet: Event-Checkliste (Qualitätsstandard vor Ort) -->
+<div class="sheet-bg" id="checkSheet">
+  <div class="sheet">
+    <div class="grab"></div>
+    <div class="sheet-title" id="ckSheetTitle">Checkliste</div>
+    <div class="muted" id="ckMeta" style="font-size:13px;margin-bottom:6px"></div>
+    <div id="ckProgress" style="font-weight:800;margin-bottom:10px"></div>
+    <div id="ckItems"></div>
+    <label class="f" for="ckNote">Bemerkung / Abweichungen</label>
+    <textarea class="input" id="ckNote" style="min-height:52px" placeholder="Besonderheiten vor Ort …"></textarea>
+    <button class="btn ok block" id="ckSave" style="margin-top:16px">Speichern</button>
+    <button class="btn ghost block" id="ckReport" style="margin-top:10px">🖨 Report-PDF (Doku für Kunden)</button>
+    <button class="btn ghost block" id="ckClose" style="margin-top:10px">Abbrechen</button>
+  </div>
+</div>
+
+<!-- Sheet: Ausschreibung -->
+<div class="sheet-bg" id="tenderSheet">
+  <div class="sheet">
+    <div class="grab"></div>
+    <div class="sheet-title" id="tdSheetTitle">Ausschreibung</div>
+    <label class="f" for="tdTitle">Titel</label><input class="input" id="tdTitle" placeholder="z.B. Messebau Landesgartenschau 2027">
+    <label class="f" for="tdClient">Auftraggeber / Vergabestelle</label><input class="input" id="tdClient" placeholder="z.B. Messe München">
+    <div class="grid2">
+      <div><label class="f" for="tdDue">Abgabefrist</label><input class="input" type="date" id="tdDue"></div>
+      <div><label class="f" for="tdVolume">Volumen €</label><input class="input" id="tdVolume" inputmode="decimal" placeholder="geschätzt"></div>
+    </div>
+    <label class="f" for="tdStatus">Status</label>
+    <select class="input" id="tdStatus">
+      <option value="entdeckt">🔎 Entdeckt</option><option value="bearbeitung">✍️ In Bearbeitung</option>
+      <option value="abgegeben">📮 Abgegeben</option><option value="gewonnen">🏆 Gewonnen</option><option value="verloren">✖️ Verloren</option>
+    </select>
+    <label class="f" for="tdNote">Notiz</label><input class="input" id="tdNote" placeholder="Portal-Link, Unterlagen, Ansprechpartner …">
+    <button class="btn ok block" id="tdSave" style="margin-top:16px">Speichern</button>
+    <button class="btn danger block hidden" id="tdDelete" style="margin-top:10px">Löschen</button>
+    <button class="btn ghost block" id="tdClose" style="margin-top:10px">Abbrechen</button>
   </div>
 </div>
 
@@ -697,6 +797,9 @@ let notes    = DB.get('notes', []);
 let customers= DB.get('customers', []);
 let fleet    = DB.get('fleet', []);
 let drivers  = DB.get('drivers', []);
+let stock    = DB.get('stock', []);
+let tenders  = DB.get('tenders', []);
+let templates= DB.get('templates', null);
 let quotes   = DB.get('quotes', []);
 let invoices = DB.get('invoices', []);
 let company  = DB.get('company', {name:'CREATEZ GmbH',addr:'',phone:'',mail:'',tax:'',vat:'19',bank:''});
@@ -709,6 +812,20 @@ if(!Array.isArray(notes))     notes=[];
 if(!Array.isArray(customers)) customers=[];
 if(!Array.isArray(fleet))     fleet=[];
 if(!Array.isArray(drivers))   drivers=[];
+if(!Array.isArray(stock))     stock=[];
+if(!Array.isArray(tenders))   tenders=[];
+// Beim allerersten Start: CREATEZ-Standard als Beispiel-Vorlage anlegen
+if(!Array.isArray(templates)) templates=[{id:'tpl-default',name:'CREATEZ Qualitätsstandard',items:[
+  'Fläche eingemessen & nach Plan markiert',
+  'Traversen / Rigging geprüft & abgenommen',
+  'Standsicherheit / Ballastierung kontrolliert',
+  'Kabelwege gesichert (Matten/Brücken)',
+  'Flucht- & Rettungswege frei',
+  'Brandschutz: B1-Nachweise am Platz',
+  'Technik-Check: Licht / Ton / Strom',
+  'Sauberkeit & Optik nach CREATEZ-Standard',
+  'Fotodokumentation erstellt',
+  'Übergabe mit Kunde durchgeführt']}];
 if(!Array.isArray(quotes))    quotes=[];
 if(!Array.isArray(invoices))  invoices=[];
 if(!company||typeof company!=='object') company={name:'CREATEZ GmbH',vat:'19'};
@@ -722,7 +839,7 @@ function uid(){
   const a=new Uint32Array(2); crypto.getRandomValues(a);
   return 'x'+a[0].toString(36)+a[1].toString(36)+Date.now().toString(36).slice(-3);
 }
-function save(){ DB.set('events',events); DB.set('partners',partners); DB.set('tasks',tasks); DB.set('fin',fin); DB.set('notes',notes); DB.set('customers',customers); DB.set('fleet',fleet); DB.set('drivers',drivers); DB.set('quotes',quotes); DB.set('invoices',invoices); DB.set('company',company) }
+function save(){ DB.set('events',events); DB.set('partners',partners); DB.set('tasks',tasks); DB.set('fin',fin); DB.set('notes',notes); DB.set('customers',customers); DB.set('fleet',fleet); DB.set('drivers',drivers); DB.set('stock',stock); DB.set('tenders',tenders); DB.set('templates',templates); DB.set('quotes',quotes); DB.set('invoices',invoices); DB.set('company',company) }
 function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2200) }
 const pad=n=>String(n).padStart(2,'0');
 const iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
@@ -824,7 +941,7 @@ document.getElementById('nav').addEventListener('click',e=>{
   if(activeView==='cal'){ renderCalendar(); renderDay(); }
   if(activeView==='tasks') renderTasks();
   if(activeView==='fin') renderFin();
-  if(activeView==='more'){ renderPartners(); renderNotes(); renderCustomers(); loadCompanyForm(); renderFleet(); renderDrivers(); renderDuties(); }
+  if(activeView==='more'){ renderPartners(); renderNotes(); renderCustomers(); loadCompanyForm(); renderFleet(); renderDrivers(); renderDuties(); renderStock(); renderTemplates(); renderTenders(); }
 });
 // Programmatischer Tab-Wechsel (z.B. vom Fristen-Radar aus)
 function switchView(name){
@@ -892,13 +1009,13 @@ function renderHome(){
 
   const ne=nextEvent(), nc=document.getElementById('nextEvCard');
   if(ne){
-    nc.innerHTML=`<div class="l">Nächster Einsatz</div><div class="t">${esc(ne.title)}</div>
+    nc.innerHTML=`<div class="l">Nächstes Event</div><div class="t">${esc(ne.title)}</div>
       <div class="meta" style="color:#c8d8f2">${esc(relLabel(ne))}</div>
       ${ne.loc?`<div class="meta" style="color:#9db9e8">📍 ${esc(ne.loc)}</div>`:''}
       <div style="margin-top:10px"><button class="chip share" id="neShare">📤 Teilen</button></div>`;
     nc.querySelector('#neShare').onclick=()=>openShare(ne);
   } else {
-    nc.innerHTML='<div class="l">Nächster Einsatz</div><div class="t" style="color:#9db9e8;font-weight:600">Keine anstehenden Einsätze 🎉</div>';
+    nc.innerHTML='<div class="l">Nächstes Event</div><div class="t" style="color:#9db9e8;font-weight:600">Keine anstehenden Events 🎉</div>';
   }
 
   const today=iso(now);
@@ -927,7 +1044,7 @@ function briefingText(){
   const offen=fin.filter(f=>f.type==='rechnung'&&!f.paid);
   const sum=offen.reduce((s,f)=>s+f.amount,0);
   let out='🗓️ Tagesbriefing · '+fmtDate(today)+'\n';
-  out+='\n📦 Einsätze ('+evs.length+'):\n';
+  out+='\n🎪 Events ('+evs.length+'):\n';
   out+= evs.length ? evs.map(e=>'• '+(e.start?e.start+' ':'')+e.title+(e.loc?' – '+e.loc:'')).join('\n') : '• keine';
   out+='\n\n✅ Offene Aufgaben ('+open.length+'):\n';
   out+= open.length ? open.slice(0,8).map(t=>'• '+t.title+(t.due?' (bis '+fmtShort(t.due)+')':'')).join('\n') : '• keine';
@@ -1008,7 +1125,7 @@ function renderDay(){
   document.getElementById('dayLabel').textContent=fmtDate(selDate);
   const box=document.getElementById('dayEvents'); box.innerHTML='';
   const evs=eventsOn(selDate);
-  if(!evs.length){ box.innerHTML='<div class="empty">Keine Einsätze an diesem Tag.<br>Mit ＋ hinzufügen.</div>'; return }
+  if(!evs.length){ box.innerHTML='<div class="empty">Keine Events an diesem Tag.<br>Mit ＋ hinzufügen.</div>'; return }
   evs.forEach(ev=>box.appendChild(eventCard(ev)));
 }
 function eventCard(ev){
@@ -1029,10 +1146,13 @@ function eventCard(ev){
       <div class="acts">
         <button class="chip share" data-share>📤 Teilen</button>
         <button class="chip" data-edit>✏️ Bearbeiten</button>
+        ${ev.check?`<button class="chip" data-check>⭐ ${checkProgress(ev).done}/${checkProgress(ev).total}</button>`:''}
       </div>
     </div>`;
   el.querySelector('[data-share]').onclick=()=>openShare(ev);
   el.querySelector('[data-edit]').onclick=()=>openEvent(ev);
+  const ckBtn=el.querySelector('[data-check]');
+  if(ckBtn) ckBtn.onclick=()=>openCheck(ev);
   return el;
 }
 document.getElementById('prevM').onclick=()=>{cursor.setMonth(cursor.getMonth()-1);renderCalendar()};
@@ -1055,16 +1175,17 @@ function refreshPartnerOptions(){
 }
 function openEvent(ev){
   editing=ev||null;
-  document.getElementById('sheetTitle').textContent=ev?'Einsatz bearbeiten':'Neuer Einsatz';
+  document.getElementById('sheetTitle').textContent=ev?'Event bearbeiten':'Neues Event';
   document.getElementById('fTitle').value=ev?.title||'';
   document.getElementById('fDate').value=ev?.date||selDate;
-  document.getElementById('fType').value=ev?.type||'Transport';
+  document.getElementById('fType').value=ev?.type||'Aufbau';
   document.getElementById('fStart').value=ev?.start||'';
   document.getElementById('fEnd').value=ev?.end||'';
   document.getElementById('fLoc').value=ev?.loc||'';
   document.getElementById('fPartner').value=ev?.partner||'';
   document.getElementById('fNote').value=ev?.note||'';
   pickColor=ev?.color||COLORS[0]; renderColors(); refreshPartnerOptions();
+  refreshQsOptions(ev?.check?.tpl);
   document.getElementById('deleteEvent').classList.toggle('hidden',!ev);
   openSheet('eventSheet');
 }
@@ -1078,6 +1199,13 @@ document.getElementById('saveEvent').onclick=()=>{
     loc:document.getElementById('fLoc').value.trim(), partner:document.getElementById('fPartner').value.trim(),
     note:document.getElementById('fNote').value.trim(), color:pickColor
   };
+  const qsName=document.getElementById('fQs').value;
+  if(!qsName){ data.check=null; }
+  else if(editing&&editing.check&&editing.check.tpl===qsName){ data.check=editing.check; }
+  else {
+    const tpl=templates.find(x=>x.name===qsName);
+    data.check=tpl?{tpl:tpl.name,note:'',items:tpl.items.map(t2=>({t:t2,done:false}))}:null;
+  }
   if(editing){ Object.assign(editing,data); } else { data.id=uid(); events.push(data); }
   save(); closeSheet('eventSheet'); selDate=data.date;
   cursor=new Date(data.date+'T00:00'); cursor.setDate(1);
@@ -1085,7 +1213,7 @@ document.getElementById('saveEvent').onclick=()=>{
 };
 document.getElementById('deleteEvent').onclick=()=>{
   if(!editing) return;
-  if(!confirm('Diesen Einsatz löschen?')) return;
+  if(!confirm('Dieses Event löschen?')) return;
   events=events.filter(e=>e!==editing); save(); closeSheet('eventSheet'); renderAll(); toast('Gelöscht');
 };
 document.getElementById('closeSheet').onclick=()=>closeSheet('eventSheet');
@@ -1354,23 +1482,29 @@ function renderFleet(){
 }
 function renderDrivers(){
   const box=document.getElementById('driversList'); box.innerHTML='';
-  if(!drivers.length){ box.innerHTML='<div class="empty">Noch keine Fahrer. Führerschein-Kontrolle &amp; Modul 95 sind Pflicht im Güterkraftverkehr.</div>'; return }
+  if(!drivers.length){ box.innerHTML='<div class="empty">Noch keine Crew. Mit Setcard-PDF stellst du dein Personal professionell vor.</div>'; return }
   drivers.forEach(d=>{
-    const lic=dueInfo(d.license,30), mod=dueInfo(d.modul,60);
+    const cert=dueInfo(d.certDate,30);
     const el=document.createElement('div'); el.className='card'; el.style.marginBottom='10px'; el.style.cursor='pointer';
-    const badges=[dueBadge(lic,'FS-Kontrolle'),dueBadge(mod,'Modul 95')].filter(Boolean).join(' ');
-    const licLine=d.license?`FS-Kontrolle ${fmtShort(d.license)}`:'';
-    const modLine=d.modul?`Modul 95 bis ${fmtShort(d.modul)}`:'';
-    const meta=[licLine,modLine].filter(Boolean).join(' · ');
-    const callBtn=d.phone?`<a class="chip" href="tel:${esc(d.phone)}" onclick="event.stopPropagation()">📞 Anrufen</a>`:'';
+    const badge=dueBadge(cert,d.cert||'Nachweis');
+    const rate=d.rate?Number(d.rate).toLocaleString('de-DE')+' €/h':'';
+    const meta=[d.role,rate].filter(Boolean).join(' · ');
+    const certUntil=d.certDate?' bis '+fmtShort(d.certDate):'';
+    const certLine=d.cert?d.cert+certUntil:'';
+    const sub=[d.skills,certLine].filter(Boolean).join(' · ');
+    const callBtn=d.phone?`<a class="chip" href="tel:${esc(d.phone)}" onclick="event.stopPropagation()">📞</a>`:'';
     el.innerHTML=`<div class="row" style="justify-content:space-between;align-items:flex-start">
-      <div style="min-width:0"><b>🧑‍✈️ ${esc(d.name||'Fahrer')}</b>
-        <div class="meta" style="font-size:13px">${esc(meta)||'Keine Termine hinterlegt'}</div>
+      <div style="min-width:0"><b>👷 ${esc(d.name||'Crew')}</b>
+        <div class="meta" style="font-size:13px">${esc(meta)||'—'}</div>
+        ${sub?`<div class="meta" style="font-size:12px">${esc(sub)}</div>`:''}
         ${d.note?`<div class="meta" style="font-size:12px">${esc(d.note)}</div>`:''}
       </div>
-      <div style="text-align:right;flex-shrink:0">${badges}</div>
+      <div style="text-align:right;flex-shrink:0">${badge}</div>
     </div>
-    ${callBtn?`<div style="margin-top:8px">${callBtn}</div>`:''}`;
+    <div class="acts" style="display:flex;gap:6px;margin-top:8px">
+      <button class="chip share" data-card>📇 Setcard</button>${callBtn}
+    </div>`;
+    el.querySelector('[data-card]').onclick=e=>{ e.stopPropagation(); printSetcard(d); };
     el.onclick=()=>openDriver(d);
     box.appendChild(el);
   });
@@ -1388,11 +1522,14 @@ function openVehicle(v){
 }
 function openDriver(d){
   editingD=d||null;
-  document.getElementById('drSheetTitle').textContent=d?'Fahrer bearbeiten':'Neuer Fahrer';
+  document.getElementById('drSheetTitle').textContent=d?'Crew bearbeiten':'Neues Crew-Mitglied';
   document.getElementById('drName').value=d?.name||'';
+  document.getElementById('drRole').value=d?.role||'Stagehand';
+  document.getElementById('drRate').value=d?.rate||'';
   document.getElementById('drPhone').value=d?.phone||'';
-  document.getElementById('drLicense').value=d?.license||'';
-  document.getElementById('drModul').value=d?.modul||'';
+  document.getElementById('drSkills').value=d?.skills||'';
+  document.getElementById('drCert').value=d?.cert||'';
+  document.getElementById('drCertDate').value=d?.certDate||'';
   document.getElementById('drNote').value=d?.note||'';
   document.getElementById('drDelete').classList.toggle('hidden',!d);
   openSheet('driverSheet');
@@ -1415,16 +1552,311 @@ document.getElementById('veClose').onclick=()=>closeSheet('vehicleSheet');
 document.getElementById('drSave').onclick=()=>{
   const name=document.getElementById('drName').value.trim();
   if(!name){ toast('Bitte Name angeben'); return }
-  const data={name,phone:document.getElementById('drPhone').value.trim(),
-    license:document.getElementById('drLicense').value,modul:document.getElementById('drModul').value,
+  const data={name,role:document.getElementById('drRole').value,
+    rate:parseAmount(document.getElementById('drRate').value)||'',
+    phone:document.getElementById('drPhone').value.trim(),
+    skills:document.getElementById('drSkills').value.trim(),
+    cert:document.getElementById('drCert').value.trim(),
+    certDate:document.getElementById('drCertDate').value,
     note:document.getElementById('drNote').value.trim()};
   if(editingD) Object.assign(editingD,data); else { data.id=uid(); drivers.push(data); }
-  save(); closeSheet('driverSheet'); renderDrivers(); renderHome(); toast('Fahrer gespeichert');
+  save(); closeSheet('driverSheet'); renderDrivers(); renderHome(); toast('Crew gespeichert');
+};
+// Setcard direkt aus dem Sheet (auch für ungespeicherte Änderungen erst speichern)
+document.getElementById('drSetcard').onclick=()=>{
+  if(!editingD){ toast('Erst speichern, dann Setcard drucken'); return }
+  closeSheet('driverSheet'); printSetcard(editingD);
 };
 document.getElementById('drDelete').onclick=()=>{
-  if(editingD&&confirm('Fahrer löschen?')){ drivers=drivers.filter(x=>x!==editingD); save(); closeSheet('driverSheet'); renderDrivers(); renderHome(); }
+  if(editingD&&confirm('Crew-Mitglied löschen?')){ drivers=drivers.filter(x=>x!==editingD); save(); closeSheet('driverSheet'); renderDrivers(); renderHome(); }
 };
 document.getElementById('drClose').onclick=()=>closeSheet('driverSheet');
+
+/* ---------- Setcard-PDF: Personal professionell vorstellen ---------- */
+function printSetcard(d){
+  const rate=d.rate?Number(d.rate).toLocaleString('de-DE')+' € / Stunde':'auf Anfrage';
+  const skills=(d.skills||'').split(',').map(x=>x.trim()).filter(Boolean);
+  const skillHtml=skills.length
+    ? skills.map(x=>`<span style="display:inline-block;border:1px solid #2f80ff;color:#2f80ff;border-radius:20px;padding:3px 12px;margin:3px 4px 3px 0;font-size:12px">${esc(x)}</span>`).join('')
+    : '<span style="color:#777">—</span>';
+  const certUntil=d.certDate?' · gültig bis '+fmtShort(d.certDate):'';
+  const certLine=d.cert?esc(d.cert)+certUntil:'—';
+  document.getElementById('printArea').innerHTML=`
+    <div class="doc">
+      <div class="hd">
+        <div><h1>${esc(company.name||'CREATEZ GmbH')}</h1>
+          <div style="font-size:11px;color:#555;white-space:pre-line;margin-top:4px">${esc([company.addr,company.phone,company.mail].filter(Boolean).join('\n'))}</div>
+        </div>
+        <div style="text-align:right"><div style="font-size:18px;font-weight:800;color:#2f80ff">SETCARD</div></div>
+      </div>
+      <div style="margin-top:26px;display:flex;gap:20px;align-items:center">
+        <div style="width:74px;height:74px;border-radius:50%;background:#2f80ff;color:#fff;display:flex;align-items:center;justify-content:center;font-size:30px;font-weight:800;flex-shrink:0">${esc((d.name||'?').trim().charAt(0).toUpperCase())}</div>
+        <div>
+          <div style="font-size:24px;font-weight:800">${esc(d.name||'')}</div>
+          <div style="font-size:14px;color:#2f80ff;font-weight:700">${esc(d.role||'')}</div>
+        </div>
+      </div>
+      <table style="margin-top:22px">
+        <tbody>
+          <tr><td style="width:160px;color:#777">Skills</td><td>${skillHtml}</td></tr>
+          <tr><td style="color:#777">Zertifikate / Nachweise</td><td>${certLine}</td></tr>
+          <tr><td style="color:#777">Konditionen</td><td><b>${rate}</b></td></tr>
+          ${d.note?`<tr><td style="color:#777">Hinweise</td><td>${esc(d.note)}</td></tr>`:''}
+          <tr><td style="color:#777">Buchung über</td><td>${esc(company.name||'CREATEZ GmbH')}${company.phone?' · '+esc(company.phone):''}${company.mail?' · '+esc(company.mail):''}</td></tr>
+        </tbody>
+      </table>
+      <div class="ft">Personalgestellung durch ${esc(company.name||'CREATEZ GmbH')} · Einsatz nach CREATEZ-Qualitätsstandard.</div>
+    </div>`;
+  const title=document.title;
+  document.title='Setcard_'+(d.name||'').replace(/\s+/g,'_');
+  setTimeout(()=>{ window.print(); document.title=title; }, 60);
+}
+
+/* ---------- Material & Verleih ---------- */
+let editingS=null;
+function renderStock(){
+  const box=document.getElementById('stockList'); box.innerHTML='';
+  if(!stock.length){ box.innerHTML='<div class="empty">Noch kein Material erfasst. Bestand, Tagessätze und Verleih-Status im Blick.</div>'; return }
+  const today=iso(new Date());
+  stock.forEach(it=>{
+    const overdue=it.lentTo&&it.lentUntil&&it.lentUntil<today;
+    const el=document.createElement('div'); el.className='card'; el.style.marginBottom='10px'; el.style.cursor='pointer';
+    let status='<span class="badge-status st-angenommen">Im Lager</span>';
+    if(it.lentTo){
+      const cls=overdue?'st-abgelehnt':'st-offen';
+      const back=it.lentUntil?' bis '+fmtShort(it.lentUntil):'';
+      const warn=overdue?'⚠️ ':'';
+      status=`<span class="badge-status ${cls}">${warn}Bei ${esc(it.lentTo)}${back}</span>`;
+    }
+    const rate=it.rate?Number(it.rate).toLocaleString('de-DE')+' €/Tag':'';
+    const meta=[(it.qty?it.qty+' Stk.':''),rate].filter(Boolean).join(' · ');
+    el.innerHTML=`<div class="row" style="justify-content:space-between;align-items:flex-start">
+      <div style="min-width:0"><b>📦 ${esc(it.name||'Material')}</b>
+        <div class="meta" style="font-size:13px">${esc(meta)||'—'}</div>
+        ${it.note?`<div class="meta" style="font-size:12px">${esc(it.note)}</div>`:''}
+      </div>
+      <div style="flex-shrink:0">${status}</div>
+    </div>`;
+    el.onclick=()=>openStock(it);
+    box.appendChild(el);
+  });
+}
+function openStock(it){
+  editingS=it||null;
+  document.getElementById('stSheetTitle').textContent=it?'Material bearbeiten':'Neues Material';
+  document.getElementById('stName').value=it?.name||'';
+  document.getElementById('stQty').value=it?.qty||'';
+  document.getElementById('stRate').value=it?.rate||'';
+  document.getElementById('stLentTo').value=it?.lentTo||'';
+  document.getElementById('stLentUntil').value=it?.lentUntil||'';
+  document.getElementById('stNote').value=it?.note||'';
+  document.getElementById('stDelete').classList.toggle('hidden',!it);
+  openSheet('stockSheet');
+}
+document.getElementById('addStock').onclick=()=>openStock(null);
+document.getElementById('stSave').onclick=()=>{
+  const name=document.getElementById('stName').value.trim();
+  if(!name){ toast('Bitte Bezeichnung angeben'); return }
+  const data={name,qty:parseAmount(document.getElementById('stQty').value)||'',
+    rate:parseAmount(document.getElementById('stRate').value)||'',
+    lentTo:document.getElementById('stLentTo').value.trim(),
+    lentUntil:document.getElementById('stLentUntil').value,
+    note:document.getElementById('stNote').value.trim()};
+  if(editingS) Object.assign(editingS,data); else { data.id=uid(); stock.push(data); }
+  save(); closeSheet('stockSheet'); renderStock(); renderHome(); toast('Material gespeichert');
+};
+document.getElementById('stDelete').onclick=()=>{
+  if(editingS&&confirm('Material löschen?')){ stock=stock.filter(x=>x!==editingS); save(); closeSheet('stockSheet'); renderStock(); renderHome(); }
+};
+document.getElementById('stClose').onclick=()=>closeSheet('stockSheet');
+
+/* ---------- Regelwerk: Qualitätsstandard-Vorlagen ---------- */
+let editingTpl=null;
+function renderTemplates(){
+  const box=document.getElementById('templatesList'); box.innerHTML='';
+  if(!templates.length){ box.innerHTML='<div class="empty">Noch keine Vorlage. Lege deinen Qualitätsstandard an!</div>'; return }
+  templates.forEach(t=>{
+    const el=document.createElement('div'); el.className='card'; el.style.marginBottom='10px'; el.style.cursor='pointer';
+    el.innerHTML=`<b>⭐ ${esc(t.name)}</b>
+      <div class="meta" style="font-size:13px">${(t.items||[]).length} Checkpunkte</div>`;
+    el.onclick=()=>openTemplate(t);
+    box.appendChild(el);
+  });
+}
+function openTemplate(t){
+  editingTpl=t||null;
+  document.getElementById('tpSheetTitle').textContent=t?'Standard bearbeiten':'Neuer Qualitätsstandard';
+  document.getElementById('tpName').value=t?.name||'';
+  document.getElementById('tpItems').value=(t?.items||[]).join('\n');
+  document.getElementById('tpDelete').classList.toggle('hidden',!t);
+  openSheet('templateSheet');
+}
+document.getElementById('addTemplate').onclick=()=>openTemplate(null);
+document.getElementById('tpSave').onclick=()=>{
+  const name=document.getElementById('tpName').value.trim();
+  const items=document.getElementById('tpItems').value.split('\n').map(x=>x.trim()).filter(Boolean);
+  if(!name){ toast('Bitte Namen angeben'); return }
+  if(!items.length){ toast('Mindestens ein Checkpunkt'); return }
+  if(editingTpl){ editingTpl.name=name; editingTpl.items=items; }
+  else templates.push({id:uid(),name,items});
+  save(); closeSheet('templateSheet'); renderTemplates(); toast('Standard gespeichert');
+};
+document.getElementById('tpDelete').onclick=()=>{
+  if(editingTpl&&confirm('Vorlage löschen? (Bereits verknüpfte Event-Checklisten bleiben erhalten)')){
+    templates=templates.filter(x=>x!==editingTpl); save(); closeSheet('templateSheet'); renderTemplates();
+  }
+};
+document.getElementById('tpClose').onclick=()=>closeSheet('templateSheet');
+// Auswahl im Event-Sheet aktuell halten
+function refreshQsOptions(sel){
+  const el=document.getElementById('fQs');
+  el.innerHTML='<option value="">— keiner —</option>'+templates.map(t=>`<option value="${esc(t.name)}">${esc(t.name)}</option>`).join('');
+  el.value=sel||'';
+  if(el.value!==(sel||'')) el.value='';
+}
+
+/* ---------- Event-Checkliste vor Ort + Report-PDF (Doku beim Kunden) ---------- */
+let ckEditing=null;
+function checkProgress(ev){
+  const items=ev.check?.items||[];
+  const done=items.filter(i=>i.done).length;
+  return {done,total:items.length};
+}
+function openCheck(ev){
+  ckEditing=ev;
+  const p=checkProgress(ev);
+  document.getElementById('ckSheetTitle').textContent='⭐ '+(ev.check?.tpl||'Checkliste');
+  document.getElementById('ckMeta').textContent=(ev.title||'')+' · '+(ev.date?fmtShort(ev.date):'');
+  document.getElementById('ckNote').value=ev.check?.note||'';
+  renderCkItems();
+  document.getElementById('ckProgress').textContent=p.done+' / '+p.total+' erledigt';
+  openSheet('checkSheet');
+}
+function renderCkItems(){
+  const box=document.getElementById('ckItems'); box.innerHTML='';
+  (ckEditing.check?.items||[]).forEach(it=>{
+    const el=document.createElement('div'); el.className=it.done?'task done':'task'; el.style.marginBottom='6px';
+    el.innerHTML=`<div class="cb">${it.done?'✓':''}</div>
+      <div class="tt" style="font-size:14px;${it.done?'opacity:.55':''}">${esc(it.t)}</div>`;
+    el.style.cursor='pointer';
+    el.onclick=()=>{ it.done=!it.done; renderCkItems();
+      const p=checkProgress(ckEditing);
+      document.getElementById('ckProgress').textContent=p.done+' / '+p.total+' erledigt';
+    };
+    box.appendChild(el);
+  });
+}
+document.getElementById('ckSave').onclick=()=>{
+  if(ckEditing?.check) ckEditing.check.note=document.getElementById('ckNote').value.trim();
+  save(); closeSheet('checkSheet'); renderDay(); renderHome(); toast('Checkliste gespeichert');
+};
+document.getElementById('ckReport').onclick=()=>{
+  if(!ckEditing) return;
+  if(ckEditing.check) ckEditing.check.note=document.getElementById('ckNote').value.trim();
+  save(); closeSheet('checkSheet'); printEventReport(ckEditing);
+};
+document.getElementById('ckClose').onclick=()=>closeSheet('checkSheet');
+function printEventReport(ev){
+  const p=checkProgress(ev);
+  const rows=(ev.check?.items||[]).map(it=>{
+    const mark=it.done?'✔':'✖';
+    const color=it.done?'#1f9d55':'#d64545';
+    return `<tr><td style="width:34px;text-align:center;color:${color};font-weight:800">${mark}</td><td>${esc(it.t)}</td></tr>`;
+  }).join('');
+  const endPart=ev.end?'–'+ev.end:'';
+  const timePart=ev.start?(' · '+ev.start+endPart+' Uhr'):'';
+  document.getElementById('printArea').innerHTML=`
+    <div class="doc">
+      <div class="hd">
+        <div><h1>${esc(company.name||'CREATEZ GmbH')}</h1>
+          <div style="font-size:11px;color:#555;white-space:pre-line;margin-top:4px">${esc([company.addr,company.phone,company.mail].filter(Boolean).join('\n'))}</div>
+        </div>
+        <div style="text-align:right;font-size:12px">
+          <div style="font-size:18px;font-weight:800;color:#2f80ff">EVENT-REPORT</div>
+          <div style="margin-top:4px">${ev.date?fmtShort(ev.date):''}</div>
+        </div>
+      </div>
+      <div style="margin-top:18px">
+        <div style="font-size:18px;font-weight:800">${esc(ev.title||'Event')}</div>
+        <div style="font-size:12px;color:#555;margin-top:3px">${esc(ev.type||'')}${timePart}${ev.loc?' · '+esc(ev.loc):''}${ev.partner?' · Kunde: '+esc(ev.partner):''}</div>
+      </div>
+      <div style="margin-top:16px;font-weight:700">Qualitätsstandard: ${esc(ev.check?.tpl||'')} — ${p.done}/${p.total} erfüllt</div>
+      <table><tbody>${rows}</tbody></table>
+      ${ev.check?.note?`<div style="margin-top:14px"><b>Bemerkungen:</b><br><span style="white-space:pre-line">${esc(ev.check.note)}</span></div>`:''}
+      <div style="display:flex;gap:40px;margin-top:56px">
+        <div style="flex:1;border-top:1px solid #333;padding-top:6px;font-size:11px">Ort, Datum · ${esc(company.name||'CREATEZ GmbH')}</div>
+        <div style="flex:1;border-top:1px solid #333;padding-top:6px;font-size:11px">Kunde / Auftraggeber</div>
+      </div>
+      <div class="ft">Dokumentation nach CREATEZ-Qualitätsstandard — damit jedes Event gleich gut wird.</div>
+    </div>`;
+  const title=document.title;
+  document.title='Report_'+(ev.title||'Event').replace(/\s+/g,'_');
+  setTimeout(()=>{ window.print(); document.title=title; }, 60);
+}
+
+/* ---------- Ausschreibungen ---------- */
+let editingTd=null;
+const TDSTAT={entdeckt:'🔎 Entdeckt',bearbeitung:'✍️ In Bearbeitung',abgegeben:'📮 Abgegeben',gewonnen:'🏆 Gewonnen',verloren:'✖️ Verloren'};
+function tenderActive(t){ return t.status==='entdeckt'||t.status==='bearbeitung' }
+function tdBadgeCls(t){
+  if(t.status==='gewonnen') return 'st-angenommen';
+  if(tenderActive(t)) return 'st-offen';
+  return 'st-abgelehnt';
+}
+function renderTenders(){
+  const box=document.getElementById('tendersList'); box.innerHTML='';
+  if(!tenders.length){ box.innerHTML='<div class="empty">Noch keine Ausschreibungen. Fristen landen automatisch im Radar.</div>'; return }
+  const today=iso(new Date());
+  [...tenders].sort((a,b)=>(a.due||'9999').localeCompare(b.due||'9999')).forEach(t=>{
+    const overdue=tenderActive(t)&&t.due&&t.due<today;
+    const el=document.createElement('div'); el.className='card'; el.style.marginBottom='10px'; el.style.cursor='pointer';
+    const vol=t.volume?Number(t.volume).toLocaleString('de-DE')+' €':'';
+    const meta=[t.client,vol].filter(Boolean).join(' · ');
+    let dueLine='';
+    if(t.due){
+      const style=overdue?'color:var(--danger);font-weight:700':'';
+      const pre=overdue?'⚠️ Frist verpasst: ':'Abgabe bis ';
+      dueLine=`<div class="meta" style="font-size:12px;${style}">${pre}${fmtShort(t.due)}</div>`;
+    }
+    el.innerHTML=`<div class="row" style="justify-content:space-between;align-items:flex-start">
+      <div style="min-width:0"><b>📢 ${esc(t.title||'Ausschreibung')}</b>
+        <div class="meta" style="font-size:13px">${esc(meta)||'—'}</div>
+        ${dueLine}
+      </div>
+      <span class="badge-status ${tdBadgeCls(t)}" style="flex-shrink:0">${TDSTAT[t.status]||t.status}</span>
+    </div>`;
+    el.onclick=()=>openTender(t);
+    box.appendChild(el);
+  });
+}
+function openTender(t){
+  editingTd=t||null;
+  document.getElementById('tdSheetTitle').textContent=t?'Ausschreibung bearbeiten':'Neue Ausschreibung';
+  document.getElementById('tdTitle').value=t?.title||'';
+  document.getElementById('tdClient').value=t?.client||'';
+  document.getElementById('tdDue').value=t?.due||'';
+  document.getElementById('tdVolume').value=t?.volume||'';
+  document.getElementById('tdStatus').value=t?.status||'entdeckt';
+  document.getElementById('tdNote').value=t?.note||'';
+  document.getElementById('tdDelete').classList.toggle('hidden',!t);
+  openSheet('tenderSheet');
+}
+document.getElementById('addTender').onclick=()=>openTender(null);
+document.getElementById('tdSave').onclick=()=>{
+  const title=document.getElementById('tdTitle').value.trim();
+  if(!title){ toast('Bitte Titel angeben'); return }
+  const data={title,client:document.getElementById('tdClient').value.trim(),
+    due:document.getElementById('tdDue').value,
+    volume:parseAmount(document.getElementById('tdVolume').value)||'',
+    status:document.getElementById('tdStatus').value,
+    note:document.getElementById('tdNote').value.trim()};
+  if(editingTd) Object.assign(editingTd,data); else { data.id=uid(); tenders.push(data); }
+  save(); closeSheet('tenderSheet'); renderTenders(); renderHome(); toast('Ausschreibung gespeichert');
+};
+document.getElementById('tdDelete').onclick=()=>{
+  if(editingTd&&confirm('Ausschreibung löschen?')){ tenders=tenders.filter(x=>x!==editingTd); save(); closeSheet('tenderSheet'); renderTenders(); renderHome(); }
+};
+document.getElementById('tdClose').onclick=()=>closeSheet('tenderSheet');
 
 /* ---------- Pflichttermine: Steuern & Abgaben einer GmbH ---------- */
 // Drittletzter Bankarbeitstag (Mo–Fr, ohne Feiertage) eines Monats
@@ -1483,10 +1915,17 @@ function radarItems(){
     if(sv&&sv.level!=='ok') items.push({date:v.service,icon:'🔧',label:`Service ${v.name||v.plate}`,level:sv.level,go:'more'});
   });
   drivers.forEach(d=>{
-    const l=dueInfo(d.license,30);
-    if(l&&l.level!=='ok') items.push({date:d.license,icon:'🪪',label:`Führerschein-Kontrolle ${d.name}`,level:l.level,go:'more'});
-    const m=dueInfo(d.modul,60);
-    if(m&&m.level!=='ok') items.push({date:d.modul,icon:'📜',label:`Modul 95 ${d.name}`,level:m.level,go:'more'});
+    const c=dueInfo(d.certDate,30);
+    if(c&&c.level!=='ok') items.push({date:d.certDate,icon:'📜',label:`${d.cert||'Nachweis'} ${d.name}`,level:c.level,go:'more'});
+  });
+  stock.forEach(it=>{
+    if(it.lentTo&&it.lentUntil&&it.lentUntil<today)
+      items.push({date:it.lentUntil,icon:'📦',label:`Rückgabe ${it.name} (${it.lentTo})`,level:'over',go:'more'});
+  });
+  tenders.forEach(t=>{
+    if(!tenderActive(t)||!t.due) return;
+    const d=dueInfo(t.due,14);
+    if(d&&d.level!=='ok') items.push({date:t.due,icon:'📢',label:`Abgabe ${t.title}`,level:d.level,go:'more'});
   });
   taxDeadlines().filter(x=>x.days<=7).forEach(x=>{
     items.push({date:x.iso,icon:x.icon,label:x.label,level:'warn',go:'more'});
@@ -1973,7 +2412,7 @@ document.getElementById('shClose').onclick=()=>closeSheet('shareSheet');
 /* Tag teilen */
 document.getElementById('shareDay').onclick=async()=>{
   const evs=eventsOn(selDate);
-  if(!evs.length){ toast('Keine Einsätze an diesem Tag'); return }
+  if(!evs.length){ toast('Keine Events an diesem Tag'); return }
   const text='📅 Einsätze '+fmtDate(selDate)+'\n\n'+evs.map(evText).join('\n\n');
   try{
     if(navigator.canShare){
@@ -2028,11 +2467,11 @@ meName.value=DB.get('name','Rui');
 meName.onchange=()=>{ DB.set('name', meName.value.trim()||'Rui'); renderHome(); toast('Name gespeichert'); };
 
 document.getElementById('exportIcs').onclick=()=>{
-  if(!events.length){toast('Keine Einsätze');return}
+  if(!events.length){toast('Keine Events');return}
   downloadFile('createz_kalender.ics', icsFor(events), 'text/calendar'); toast('Exportiert');
 };
 document.getElementById('shareAll').onclick=async()=>{
-  if(!events.length){toast('Keine Einsätze');return}
+  if(!events.length){toast('Keine Events');return}
   try{
     const file=new File([icsFor(events)],'createz_kalender.ics',{type:'text/calendar'});
     if(navigator.canShare&&navigator.canShare({files:[file]})){ await navigator.share({title:'CREATEZ Kalender',files:[file]}); return; }
@@ -2074,7 +2513,7 @@ function importIcs(text){
   });
   save(); renderAll(); toast(n+' Termine importiert');
 }
-document.getElementById('exportJson').onclick=()=>downloadFile('createz_backup.json', JSON.stringify({events,partners,tasks,fin,notes,customers,quotes,invoices,company,fleet,drivers},null,2),'application/json');
+document.getElementById('exportJson').onclick=()=>downloadFile('createz_backup.json', JSON.stringify({events,partners,tasks,fin,notes,customers,quotes,invoices,company,fleet,drivers,stock,tenders,templates},null,2),'application/json');
 document.getElementById('importJson').onclick=()=>document.getElementById('jsonFile').click();
 document.getElementById('jsonFile').onchange=e=>{
   const f=e.target.files[0];
@@ -2094,6 +2533,9 @@ document.getElementById('jsonFile').onchange=e=>{
       if(arr(d.invoices)) invoices=d.invoices;
       if(arr(d.fleet)) fleet=d.fleet;
       if(arr(d.drivers)) drivers=d.drivers;
+      if(arr(d.stock)) stock=d.stock;
+      if(arr(d.tenders)) tenders=d.tenders;
+      if(arr(d.templates)) templates=d.templates;
       if(d.company&&typeof d.company==='object') company=d.company;
       renderAll(); save(); toast('Backup importiert'); // erst rendern, dann speichern
     }catch{ toast('Ungültige Datei'); } e.target.value=''; };
@@ -2110,6 +2552,7 @@ function renderAll(){
   renderHome(); renderCalendar(); renderDay(); renderTasks(); renderFin();
   renderPartners(); renderNotes(); renderCustomers(); loadCompanyForm();
   renderFleet(); renderDrivers(); renderDuties();
+  renderStock(); renderTemplates(); renderTenders();
   refreshPartnerOptions(); refreshCustomerOptions(); applyFabSide();
 }
 
