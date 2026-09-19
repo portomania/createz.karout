@@ -248,6 +248,9 @@
       <div class="stat"><div class="n money" id="stOffen" style="color:var(--warn)">0 €</div><div class="l">Rechnungen offen</div></div>
     </div>
 
+    <h2 class="section">🚨 Fristen-Radar</h2>
+    <div id="radar"></div>
+
     <h2 class="section">Schnellaktionen</h2>
     <div class="qa">
       <button id="qaEvent"><span class="ico">📦</span>Neuer Einsatz</button>
@@ -359,6 +362,20 @@
     <h2 class="section">Kunden</h2>
     <div id="customersList"></div>
     <button class="btn block" id="addCustomer">+ Kunde hinzufügen</button>
+
+    <h2 class="section">🚚 Fuhrpark</h2>
+    <div id="fleetList"></div>
+    <button class="btn block" id="addVehicle">+ Fahrzeug hinzufügen</button>
+
+    <h2 class="section">🧑‍✈️ Fahrer</h2>
+    <div id="driversList"></div>
+    <button class="btn block" id="addDriver">+ Fahrer hinzufügen</button>
+
+    <h2 class="section">📋 Pflichttermine (Steuern &amp; Abgaben)</h2>
+    <div class="card">
+      <div class="muted" style="font-size:13px;margin-bottom:10px">Automatisch berechnet für eine GmbH — die nächsten Termine. Angaben ohne Gewähr, bei Dauerfristverlängerung verschiebt sich die USt-VA um einen Monat.</div>
+      <div id="dutiesList"></div>
+    </div>
 
     <h2 class="section">Firmendaten (für Angebote)</h2>
     <div class="card">
@@ -594,6 +611,42 @@
   </div>
 </div>
 
+<!-- Sheet: Fahrzeug -->
+<div class="sheet-bg" id="vehicleSheet">
+  <div class="sheet">
+    <div class="grab"></div>
+    <div class="sheet-title" id="veSheetTitle">Fahrzeug</div>
+    <label class="f" for="veName">Bezeichnung</label><input class="input" id="veName" placeholder="z.B. Sprinter 316 · Koffer">
+    <label class="f" for="vePlate">Kennzeichen</label><input class="input" id="vePlate" placeholder="DAH-CZ 123">
+    <div class="grid2">
+      <div><label class="f" for="veTuv">TÜV / HU bis</label><input class="input" type="date" id="veTuv"></div>
+      <div><label class="f" for="veService">Nächster Service</label><input class="input" type="date" id="veService"></div>
+    </div>
+    <label class="f" for="veNote">Notiz</label><input class="input" id="veNote" placeholder="Versicherung, Leasing, Mängel …">
+    <button class="btn ok block" id="veSave" style="margin-top:16px">Speichern</button>
+    <button class="btn danger block hidden" id="veDelete" style="margin-top:10px">Löschen</button>
+    <button class="btn ghost block" id="veClose" style="margin-top:10px">Abbrechen</button>
+  </div>
+</div>
+
+<!-- Sheet: Fahrer -->
+<div class="sheet-bg" id="driverSheet">
+  <div class="sheet">
+    <div class="grab"></div>
+    <div class="sheet-title" id="drSheetTitle">Fahrer</div>
+    <label class="f" for="drName">Name</label><input class="input" id="drName" placeholder="Vor- und Nachname">
+    <label class="f" for="drPhone">Telefon</label><input class="input" id="drPhone" type="tel" placeholder="+49 …">
+    <div class="grid2">
+      <div><label class="f" for="drLicense">Führerschein-Kontrolle am</label><input class="input" type="date" id="drLicense"></div>
+      <div><label class="f" for="drModul">Modul 95 gültig bis</label><input class="input" type="date" id="drModul"></div>
+    </div>
+    <label class="f" for="drNote">Notiz</label><input class="input" id="drNote" placeholder="ADR-Schein, Fahrerkarte …">
+    <button class="btn ok block" id="drSave" style="margin-top:16px">Speichern</button>
+    <button class="btn danger block hidden" id="drDelete" style="margin-top:10px">Löschen</button>
+    <button class="btn ghost block" id="drClose" style="margin-top:10px">Abbrechen</button>
+  </div>
+</div>
+
 <!-- QUOTE SHEET -->
 <div class="sheet-bg" id="quoteSheet">
   <div class="sheet">
@@ -642,6 +695,8 @@ let tasks    = DB.get('tasks', []);
 let fin      = DB.get('fin', []);
 let notes    = DB.get('notes', []);
 let customers= DB.get('customers', []);
+let fleet    = DB.get('fleet', []);
+let drivers  = DB.get('drivers', []);
 let quotes   = DB.get('quotes', []);
 let invoices = DB.get('invoices', []);
 let company  = DB.get('company', {name:'CREATEZ GmbH',addr:'',phone:'',mail:'',tax:'',vat:'19',bank:''});
@@ -652,6 +707,8 @@ if(!Array.isArray(tasks))     tasks=[];
 if(!Array.isArray(fin))       fin=[];
 if(!Array.isArray(notes))     notes=[];
 if(!Array.isArray(customers)) customers=[];
+if(!Array.isArray(fleet))     fleet=[];
+if(!Array.isArray(drivers))   drivers=[];
 if(!Array.isArray(quotes))    quotes=[];
 if(!Array.isArray(invoices))  invoices=[];
 if(!company||typeof company!=='object') company={name:'CREATEZ GmbH',vat:'19'};
@@ -665,7 +722,7 @@ function uid(){
   const a=new Uint32Array(2); crypto.getRandomValues(a);
   return 'x'+a[0].toString(36)+a[1].toString(36)+Date.now().toString(36).slice(-3);
 }
-function save(){ DB.set('events',events); DB.set('partners',partners); DB.set('tasks',tasks); DB.set('fin',fin); DB.set('notes',notes); DB.set('customers',customers); DB.set('quotes',quotes); DB.set('invoices',invoices); DB.set('company',company) }
+function save(){ DB.set('events',events); DB.set('partners',partners); DB.set('tasks',tasks); DB.set('fin',fin); DB.set('notes',notes); DB.set('customers',customers); DB.set('fleet',fleet); DB.set('drivers',drivers); DB.set('quotes',quotes); DB.set('invoices',invoices); DB.set('company',company) }
 function toast(m){ const t=document.getElementById('toast'); t.textContent=m; t.classList.add('show'); clearTimeout(t._t); t._t=setTimeout(()=>t.classList.remove('show'),2200) }
 const pad=n=>String(n).padStart(2,'0');
 const iso=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
@@ -767,8 +824,13 @@ document.getElementById('nav').addEventListener('click',e=>{
   if(activeView==='cal'){ renderCalendar(); renderDay(); }
   if(activeView==='tasks') renderTasks();
   if(activeView==='fin') renderFin();
-  if(activeView==='more'){ renderPartners(); renderNotes(); renderCustomers(); loadCompanyForm(); }
+  if(activeView==='more'){ renderPartners(); renderNotes(); renderCustomers(); loadCompanyForm(); renderFleet(); renderDrivers(); renderDuties(); }
 });
+// Programmatischer Tab-Wechsel (z.B. vom Fristen-Radar aus)
+function switchView(name){
+  const b=document.querySelector('#nav button[data-view="'+name+'"]');
+  if(b) b.click();
+}
 // Finanzen-Segmente: Buchungen / Umsatz / Angebote
 let finSeg='buchungen';
 document.getElementById('finSeg').addEventListener('click',e=>{
@@ -854,6 +916,7 @@ function renderHome(){
   const open=tasks.filter(t=>!t.done).sort(taskSort).slice(0,5);
   if(!open.length) hk.innerHTML='<div class="empty">Keine offenen Aufgaben. 👍</div>';
   else open.forEach(t=>hk.appendChild(taskRow(t)));
+  renderRadar();
 }
 
 /* Briefing */
@@ -1248,6 +1311,203 @@ document.getElementById('cuDelete').onclick=()=>{
   if(editingC&&confirm('Kunde löschen?')){ customers=customers.filter(x=>x!==editingC); save(); closeSheet('customerSheet'); renderCustomers(); }
 };
 document.getElementById('cuClose').onclick=()=>closeSheet('customerSheet');
+
+/* ---------- Fuhrpark & Fahrer (Pflichten im Güterkraftverkehr) ---------- */
+let editingV=null, editingD=null;
+// Wie dringend ist ein Termin? over = überfällig, warn = innerhalb warnDays, ok = später
+function dueInfo(dateStr, warnDays){
+  if(!dateStr) return null;
+  const today=new Date(); today.setHours(0,0,0,0);
+  const d=new Date(dateStr+'T00:00:00');
+  const days=Math.round((d-today)/86400000);
+  let level='ok';
+  if(days<0) level='over';
+  else if(days<=warnDays) level='warn';
+  return {days, level};
+}
+function dueBadge(info, label){
+  if(!info) return '';
+  if(info.level==='over') return `<span class="badge-status st-abgelehnt">⚠️ ${label} überfällig</span>`;
+  if(info.level==='warn') return `<span class="badge-status st-offen">${label} in ${info.days} Tg.</span>`;
+  return '';
+}
+function renderFleet(){
+  const box=document.getElementById('fleetList'); box.innerHTML='';
+  if(!fleet.length){ box.innerHTML='<div class="empty">Noch keine Fahrzeuge. TÜV- und Service-Termine im Blick behalten!</div>'; return }
+  fleet.forEach(v=>{
+    const tuv=dueInfo(v.tuv,30), svc=dueInfo(v.service,30);
+    const el=document.createElement('div'); el.className='card'; el.style.marginBottom='10px'; el.style.cursor='pointer';
+    const badges=[dueBadge(tuv,'TÜV'),dueBadge(svc,'Service')].filter(Boolean).join(' ');
+    const tuvLine=v.tuv?`TÜV/HU bis ${fmtShort(v.tuv)}`:'';
+    const svcLine=v.service?`Service ${fmtShort(v.service)}`:'';
+    const meta=[v.plate,tuvLine,svcLine].filter(Boolean).join(' · ');
+    el.innerHTML=`<div class="row" style="justify-content:space-between;align-items:flex-start">
+      <div style="min-width:0"><b>🚚 ${esc(v.name||v.plate||'Fahrzeug')}</b>
+        <div class="meta" style="font-size:13px">${esc(meta)}</div>
+        ${v.note?`<div class="meta" style="font-size:12px">${esc(v.note)}</div>`:''}
+      </div>
+      <div style="text-align:right;flex-shrink:0">${badges}</div>
+    </div>`;
+    el.onclick=()=>openVehicle(v);
+    box.appendChild(el);
+  });
+}
+function renderDrivers(){
+  const box=document.getElementById('driversList'); box.innerHTML='';
+  if(!drivers.length){ box.innerHTML='<div class="empty">Noch keine Fahrer. Führerschein-Kontrolle &amp; Modul 95 sind Pflicht im Güterkraftverkehr.</div>'; return }
+  drivers.forEach(d=>{
+    const lic=dueInfo(d.license,30), mod=dueInfo(d.modul,60);
+    const el=document.createElement('div'); el.className='card'; el.style.marginBottom='10px'; el.style.cursor='pointer';
+    const badges=[dueBadge(lic,'FS-Kontrolle'),dueBadge(mod,'Modul 95')].filter(Boolean).join(' ');
+    const licLine=d.license?`FS-Kontrolle ${fmtShort(d.license)}`:'';
+    const modLine=d.modul?`Modul 95 bis ${fmtShort(d.modul)}`:'';
+    const meta=[licLine,modLine].filter(Boolean).join(' · ');
+    const callBtn=d.phone?`<a class="chip" href="tel:${esc(d.phone)}" onclick="event.stopPropagation()">📞 Anrufen</a>`:'';
+    el.innerHTML=`<div class="row" style="justify-content:space-between;align-items:flex-start">
+      <div style="min-width:0"><b>🧑‍✈️ ${esc(d.name||'Fahrer')}</b>
+        <div class="meta" style="font-size:13px">${esc(meta)||'Keine Termine hinterlegt'}</div>
+        ${d.note?`<div class="meta" style="font-size:12px">${esc(d.note)}</div>`:''}
+      </div>
+      <div style="text-align:right;flex-shrink:0">${badges}</div>
+    </div>
+    ${callBtn?`<div style="margin-top:8px">${callBtn}</div>`:''}`;
+    el.onclick=()=>openDriver(d);
+    box.appendChild(el);
+  });
+}
+function openVehicle(v){
+  editingV=v||null;
+  document.getElementById('veSheetTitle').textContent=v?'Fahrzeug bearbeiten':'Neues Fahrzeug';
+  document.getElementById('veName').value=v?.name||'';
+  document.getElementById('vePlate').value=v?.plate||'';
+  document.getElementById('veTuv').value=v?.tuv||'';
+  document.getElementById('veService').value=v?.service||'';
+  document.getElementById('veNote').value=v?.note||'';
+  document.getElementById('veDelete').classList.toggle('hidden',!v);
+  openSheet('vehicleSheet');
+}
+function openDriver(d){
+  editingD=d||null;
+  document.getElementById('drSheetTitle').textContent=d?'Fahrer bearbeiten':'Neuer Fahrer';
+  document.getElementById('drName').value=d?.name||'';
+  document.getElementById('drPhone').value=d?.phone||'';
+  document.getElementById('drLicense').value=d?.license||'';
+  document.getElementById('drModul').value=d?.modul||'';
+  document.getElementById('drNote').value=d?.note||'';
+  document.getElementById('drDelete').classList.toggle('hidden',!d);
+  openSheet('driverSheet');
+}
+document.getElementById('addVehicle').onclick=()=>openVehicle(null);
+document.getElementById('addDriver').onclick=()=>openDriver(null);
+document.getElementById('veSave').onclick=()=>{
+  const name=document.getElementById('veName').value.trim();
+  const plate=document.getElementById('vePlate').value.trim();
+  if(!name&&!plate){ toast('Bezeichnung oder Kennzeichen angeben'); return }
+  const data={name,plate,tuv:document.getElementById('veTuv').value,
+    service:document.getElementById('veService').value,note:document.getElementById('veNote').value.trim()};
+  if(editingV) Object.assign(editingV,data); else { data.id=uid(); fleet.push(data); }
+  save(); closeSheet('vehicleSheet'); renderFleet(); renderHome(); toast('Fahrzeug gespeichert');
+};
+document.getElementById('veDelete').onclick=()=>{
+  if(editingV&&confirm('Fahrzeug löschen?')){ fleet=fleet.filter(x=>x!==editingV); save(); closeSheet('vehicleSheet'); renderFleet(); renderHome(); }
+};
+document.getElementById('veClose').onclick=()=>closeSheet('vehicleSheet');
+document.getElementById('drSave').onclick=()=>{
+  const name=document.getElementById('drName').value.trim();
+  if(!name){ toast('Bitte Name angeben'); return }
+  const data={name,phone:document.getElementById('drPhone').value.trim(),
+    license:document.getElementById('drLicense').value,modul:document.getElementById('drModul').value,
+    note:document.getElementById('drNote').value.trim()};
+  if(editingD) Object.assign(editingD,data); else { data.id=uid(); drivers.push(data); }
+  save(); closeSheet('driverSheet'); renderDrivers(); renderHome(); toast('Fahrer gespeichert');
+};
+document.getElementById('drDelete').onclick=()=>{
+  if(editingD&&confirm('Fahrer löschen?')){ drivers=drivers.filter(x=>x!==editingD); save(); closeSheet('driverSheet'); renderDrivers(); renderHome(); }
+};
+document.getElementById('drClose').onclick=()=>closeSheet('driverSheet');
+
+/* ---------- Pflichttermine: Steuern & Abgaben einer GmbH ---------- */
+// Drittletzter Bankarbeitstag (Mo–Fr, ohne Feiertage) eines Monats
+function svDueDate(year,month){
+  const last=new Date(year,month+1,0);
+  let count=0;
+  for(let day=last.getDate(); day>=1; day--){
+    const d=new Date(year,month,day);
+    const wd=d.getDay();
+    if(wd!==0&&wd!==6){ count++; if(count===3) return d; }
+  }
+  return last;
+}
+function taxDeadlines(){
+  const today=new Date(); today.setHours(0,0,0,0);
+  const list=[];
+  for(let off=0; off<3; off++){
+    const ref=new Date(today.getFullYear(), today.getMonth()+off, 1);
+    const y=ref.getFullYear(), m=ref.getMonth();
+    list.push({date:new Date(y,m,10),label:'USt-Voranmeldung & Lohnsteuer',icon:'🏛'});
+    list.push({date:svDueDate(y,m),label:'SV-Beiträge (Krankenkassen)',icon:'🏥'});
+    if([1,4,7,10].includes(m)) list.push({date:new Date(y,m,15),label:'Gewerbesteuer-Vorauszahlung',icon:'🏛'});
+    if([2,5,8,11].includes(m)) list.push({date:new Date(y,m,10),label:'Körperschaftsteuer-Vorauszahlung',icon:'🏛'});
+  }
+  return list.filter(x=>x.date>=today).sort((a,b)=>a.date-b.date)
+    .map(x=>({...x,iso:iso(x.date),days:Math.round((x.date-today)/86400000)}));
+}
+function renderDuties(){
+  const box=document.getElementById('dutiesList'); box.innerHTML='';
+  taxDeadlines().slice(0,6).forEach(x=>{
+    const el=document.createElement('div');
+    el.className='row'; el.style.cssText='justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--line)';
+    let when=`in ${x.days} Tagen`;
+    if(x.days===0) when='heute!';
+    else if(x.days===1) when='morgen';
+    const hot=x.days<=7?'color:var(--warn);font-weight:700':'color:var(--muted)';
+    el.innerHTML=`<div style="min-width:0">${x.icon} <b style="font-size:14px">${esc(x.label)}</b>
+        <div class="meta" style="font-size:12px">${fmtShort(x.iso)}</div></div>
+      <span style="font-size:13px;${hot}">${when}</span>`;
+    box.appendChild(el);
+  });
+}
+
+/* ---------- Fristen-Radar (Startseite): alles Dringende an einem Ort ---------- */
+function radarItems(){
+  const items=[];
+  const today=iso(new Date());
+  invoices.forEach(v=>{
+    if(!v.paid&&v.valid&&v.valid<today)
+      items.push({date:v.valid,icon:'💶',label:`Rechnung ${v.number} überfällig (${eur(quoteGross(v))})`,level:'over',go:'fin'});
+  });
+  fleet.forEach(v=>{
+    const t=dueInfo(v.tuv,30);
+    if(t&&t.level!=='ok') items.push({date:v.tuv,icon:'🚚',label:`TÜV/HU ${v.name||v.plate}`,level:t.level,go:'more'});
+    const sv=dueInfo(v.service,30);
+    if(sv&&sv.level!=='ok') items.push({date:v.service,icon:'🔧',label:`Service ${v.name||v.plate}`,level:sv.level,go:'more'});
+  });
+  drivers.forEach(d=>{
+    const l=dueInfo(d.license,30);
+    if(l&&l.level!=='ok') items.push({date:d.license,icon:'🪪',label:`Führerschein-Kontrolle ${d.name}`,level:l.level,go:'more'});
+    const m=dueInfo(d.modul,60);
+    if(m&&m.level!=='ok') items.push({date:d.modul,icon:'📜',label:`Modul 95 ${d.name}`,level:m.level,go:'more'});
+  });
+  taxDeadlines().filter(x=>x.days<=7).forEach(x=>{
+    items.push({date:x.iso,icon:x.icon,label:x.label,level:'warn',go:'more'});
+  });
+  return items.sort((a,b)=>(a.date||'').localeCompare(b.date||'')).slice(0,6);
+}
+function renderRadar(){
+  const box=document.getElementById('radar'); box.innerHTML='';
+  const items=radarItems();
+  if(!items.length){ box.innerHTML='<div class="empty">✅ Alles im grünen Bereich — keine dringenden Fristen.</div>'; return }
+  items.forEach(it=>{
+    const el=document.createElement('div'); el.className='card'; el.style.cssText='margin-bottom:8px;padding:10px 14px;cursor:pointer;border-left:3px solid '+(it.level==='over'?'var(--danger)':'var(--warn)');
+    const state=it.level==='over'?'überfällig':'fällig';
+    el.innerHTML=`<div class="row" style="justify-content:space-between">
+      <div style="min-width:0;font-size:14px">${it.icon} <b>${esc(it.label)}</b></div>
+      <span class="meta" style="font-size:12px;flex-shrink:0;color:${it.level==='over'?'var(--danger)':'var(--warn)'}">${state} ${it.date?fmtShort(it.date):''}</span>
+    </div>`;
+    el.onclick=()=>switchView(it.go);
+    box.appendChild(el);
+  });
+}
 
 /* ---------- Firmendaten ---------- */
 function loadCompanyForm(){
@@ -1814,7 +2074,7 @@ function importIcs(text){
   });
   save(); renderAll(); toast(n+' Termine importiert');
 }
-document.getElementById('exportJson').onclick=()=>downloadFile('createz_backup.json', JSON.stringify({events,partners,tasks,fin,notes,customers,quotes,invoices,company},null,2),'application/json');
+document.getElementById('exportJson').onclick=()=>downloadFile('createz_backup.json', JSON.stringify({events,partners,tasks,fin,notes,customers,quotes,invoices,company,fleet,drivers},null,2),'application/json');
 document.getElementById('importJson').onclick=()=>document.getElementById('jsonFile').click();
 document.getElementById('jsonFile').onchange=e=>{
   const f=e.target.files[0];
@@ -1832,6 +2092,8 @@ document.getElementById('jsonFile').onchange=e=>{
       if(arr(d.customers)) customers=d.customers;
       if(arr(d.quotes)) quotes=d.quotes;
       if(arr(d.invoices)) invoices=d.invoices;
+      if(arr(d.fleet)) fleet=d.fleet;
+      if(arr(d.drivers)) drivers=d.drivers;
       if(d.company&&typeof d.company==='object') company=d.company;
       renderAll(); save(); toast('Backup importiert'); // erst rendern, dann speichern
     }catch{ toast('Ungültige Datei'); } e.target.value=''; };
@@ -1847,6 +2109,7 @@ document.getElementById('logout').onclick=lock;
 function renderAll(){
   renderHome(); renderCalendar(); renderDay(); renderTasks(); renderFin();
   renderPartners(); renderNotes(); renderCustomers(); loadCompanyForm();
+  renderFleet(); renderDrivers(); renderDuties();
   refreshPartnerOptions(); refreshCustomerOptions(); applyFabSide();
 }
 
