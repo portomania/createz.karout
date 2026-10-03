@@ -1,7 +1,7 @@
 {
-  "name": "CREATEZ Geschäftsführer Cockpit",
+  "name": "CREATEZ Event Control Center",
   "short_name": "CREATEZ",
-  "description": "Geschäftsführer-Cockpit der CREATEZ GmbH: Einsatz-Kalender, Aufgaben, Finanzen und Notizen – mobil und offline.",
+  "description": "Control Center der CREATEZ GmbH – Eventdienstleistung & Generalunternehmung: Events, Crew, Material, Qualitätsstandards, Ausschreibungen und Finanzen. Mobil und offline.",
   "start_url": "./app.html",
   "scope": "./",
   "display": "standalone",
