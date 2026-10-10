@@ -60,3 +60,41 @@ Datenstand. Für denselben Stand auf mehreren Geräten: Backup über
 `app.html` vom Server geholt, der Cache dient nur als Offline-Reserve. Zuvor galt
 cache-first für alles — installierte Geräte bekamen dadurch dauerhaft eine alte
 Version und Updates kamen nie an.
+
+## Übergabe an andere Systeme
+
+Die App ist bewusst eigenständig: eine Datei, offline nutzbar, ohne Server.
+Andere Systeme werden nicht angebunden, sondern **über Dateien bedient** — so
+bleibt jedes Werkzeug für sich lauffähig und austauschbar.
+
+**Event-Report als JSON** — in der Checkliste eines Events über
+„📤 Daten übergeben (JSON)". Gedacht zum Einspielen in ein Kundensystem
+(z. B. TRIXITT), damit der Qualitätsstandard dort dokumentiert ist, ohne ihn
+abzutippen. Aufbau:
+
+```json
+{
+  "format": "createz.event-report",
+  "version": 1,
+  "erstellt": "2026-10-11T08:30:00.000Z",
+  "dienstleister": { "name": "…", "anschrift": "…", "telefon": "…",
+                     "mail": "…", "registergericht": "…",
+                     "geschaeftsfuehrer": "…", "ustIdNr": "…" },
+  "event": { "id": "…", "titel": "…", "datum": "2026-10-11",
+             "von": "07:00", "bis": "15:00", "typ": "Messebau",
+             "ort": "…", "kunde": "…", "notiz": "…" },
+  "qualitaetsstandard": {
+    "name": "CREATEZ Qualitätsstandard",
+    "erfuellt": 9, "gesamt": 10, "bemerkung": "…",
+    "punkte": [ { "punkt": "Fläche eingemessen …", "erfuellt": true } ]
+  }
+}
+```
+
+`format` und `version` sind stabil: Erweiterungen kommen als neue Felder dazu,
+bestehende Felder behalten Name und Bedeutung. Ändert sich das grundlegend,
+steigt `version`.
+
+Daneben gibt es weiterhin: vollständiges **JSON-Backup** (Mehr → Daten),
+**.ics** für Kalender, **CSV** für die Buchhaltung und die **PDFs**
+(Angebot, Rechnung, Setcard, Event-Report).
