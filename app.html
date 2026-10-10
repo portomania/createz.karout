@@ -392,7 +392,7 @@
 
     <h2 class="section">Firmendaten (für Angebote)</h2>
     <div class="card">
-      <div class="muted" style="font-size:13px;margin-bottom:10px">Erscheinen im Briefkopf aller PDFs (Angebote, Rechnungen, Reports, Setcards).</div>
+      <div class="muted" style="font-size:13px;margin-bottom:10px">Erscheinen im Briefkopf aller PDFs. Registergericht, HRB und Geschäftsführer sind Pflichtangaben für Geschäftsbriefe einer GmbH (§ 35a GmbHG).</div>
       <label class="f" for="coName" style="margin-top:0">Firmenname</label>
       <input class="input" id="coName" placeholder="CREATEZ GmbH">
       <label class="f" for="coAddr">Anschrift</label>
@@ -407,6 +407,10 @@
       </div>
       <label class="f" for="coBank">IBAN / Bank</label>
       <input class="input" id="coBank" placeholder="DE.. · Bankname">
+      <div class="grid2">
+        <div><label class="f" for="coReg">Registergericht / HRB</label><input class="input" id="coReg" placeholder="Amtsgericht … HRB …"></div>
+        <div><label class="f" for="coCeo">Geschäftsführer</label><input class="input" id="coCeo" placeholder="Vor- und Nachname"></div>
+      </div>
       <button class="btn ok block" id="coSave" style="margin-top:14px">Firmendaten speichern</button>
     </div>
 
@@ -802,7 +806,7 @@ let tenders  = DB.get('tenders', []);
 let templates= DB.get('templates', null);
 let quotes   = DB.get('quotes', []);
 let invoices = DB.get('invoices', []);
-let company  = DB.get('company', {name:'CREATEZ GmbH',addr:'',phone:'',mail:'',tax:'',vat:'19',bank:''});
+let company  = DB.get('company', {name:'CREATEZ GmbH',addr:'Eckeseyer Str. 167\n58089 Hagen',phone:'+49 155 690 624 78',mail:'',tax:'',vat:'19',bank:'',reg:'Amtsgericht Hagen HRB 13422',ceo:'Rui Macedo Santos'});
 // Defekte Daten (z.B. aus fehlerhaftem Backup) dürfen die App nie dauerhaft brechen
 if(!Array.isArray(events))    events=[];
 if(!Array.isArray(partners))  partners=[];
@@ -1605,7 +1609,7 @@ function printSetcard(d){
           <tr><td style="color:#777">Buchung über</td><td>${esc(company.name||'CREATEZ GmbH')}${company.phone?' · '+esc(company.phone):''}${company.mail?' · '+esc(company.mail):''}</td></tr>
         </tbody>
       </table>
-      <div class="ft">Personalgestellung durch ${esc(company.name||'CREATEZ GmbH')} · Einsatz nach CREATEZ-Qualitätsstandard.</div>
+      <div class="ft">Personalgestellung durch ${esc(company.name||'CREATEZ GmbH')} · Einsatz nach CREATEZ-Qualitätsstandard.<br>${legalFooter()}</div>
     </div>`;
   const title=document.title;
   document.title='Setcard_'+(d.name||'').replace(/\s+/g,'_');
@@ -1787,7 +1791,7 @@ function printEventReport(ev){
         <div style="flex:1;border-top:1px solid #333;padding-top:6px;font-size:11px">Ort, Datum · ${esc(company.name||'CREATEZ GmbH')}</div>
         <div style="flex:1;border-top:1px solid #333;padding-top:6px;font-size:11px">Kunde / Auftraggeber</div>
       </div>
-      <div class="ft">Dokumentation nach CREATEZ-Qualitätsstandard — damit jedes Event gleich gut wird.</div>
+      <div class="ft">Dokumentation nach CREATEZ-Qualitätsstandard — damit jedes Event gleich gut wird.<br>${legalFooter()}</div>
     </div>`;
   const title=document.title;
   document.title='Report_'+(ev.title||'Event').replace(/\s+/g,'_');
@@ -1957,12 +1961,15 @@ function loadCompanyForm(){
   document.getElementById('coTax').value=company.tax||'';
   document.getElementById('coVat').value=company.vat||'19';
   document.getElementById('coBank').value=company.bank||'';
+  document.getElementById('coReg').value=company.reg||'';
+  document.getElementById('coCeo').value=company.ceo||'';
 }
 document.getElementById('coSave').onclick=()=>{
   company={name:document.getElementById('coName').value.trim()||'CREATEZ GmbH',
     addr:document.getElementById('coAddr').value.trim(),phone:document.getElementById('coPhone').value.trim(),
     mail:document.getElementById('coMail').value.trim(),tax:document.getElementById('coTax').value.trim(),
-    vat:document.getElementById('coVat').value.trim()||'19',bank:document.getElementById('coBank').value.trim()};
+    vat:document.getElementById('coVat').value.trim()||'19',bank:document.getElementById('coBank').value.trim(),
+    reg:document.getElementById('coReg').value.trim(),ceo:document.getElementById('coCeo').value.trim()};
   save(); toast('Firmendaten gespeichert');
 };
 
@@ -2174,6 +2181,13 @@ function quoteToInvoice(q){
   toast('Rechnung '+v.number+' erstellt 🧾');
 }
 
+// Pflichtangaben für Geschäftsbriefe einer GmbH (§ 35a GmbHG) + Steuer-/Bankdaten
+function legalFooter(){
+  const parts=[company.reg,company.ceo?('Geschäftsführer: '+company.ceo):'',
+    company.tax?('USt-IdNr.: '+company.tax):'',company.bank?('Bank: '+company.bank):''];
+  return esc(parts.filter(Boolean).join(' · '));
+}
+
 /* PDF: sauberes Druck-Layout → Browser „Drucken → Als PDF speichern" (offline, ohne Bibliothek)
    Rendert Angebote UND Rechnungen (doc.kind==='invoice') mit demselben Briefkopf. */
 function printDoc(q){
@@ -2229,7 +2243,7 @@ function printDoc(q){
       </div>
       ${q.note?`<div style="margin-top:18px;white-space:pre-line">${esc(q.note)}</div>`:''}
       <div class="ft">
-        ${esc([company.tax?('USt-IdNr.: '+company.tax):'',company.bank?('Bank: '+company.bank):''].filter(Boolean).join(' · '))}
+        ${legalFooter()}
         <br>${esc(footerText)}
       </div>
     </div>`;
