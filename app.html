@@ -217,8 +217,13 @@
   <div class="muted" style="font-size:13px" id="loginSub">Geschäftsführer-Zugang · PIN eingeben</div>
   <div class="pin" id="pinDots"></div>
   <div class="keys" id="keys"></div>
-  <div class="muted" id="pinHint" style="font-size:12px;margin-top:18px">Erst-PIN: <b>1234</b> · danach unter „Mehr" änderbar</div>
+  <div class="muted" id="pinHint" style="font-size:12px;margin-top:18px">Erst-PIN: <b>1234</b> · gilt pro Gerät/Browser · danach unter „Mehr" änderbar</div>
+  <button class="btn ghost" id="pinForgot" style="margin-top:18px;min-width:200px">PIN vergessen?</button>
   <button class="btn ghost hidden" id="pinCancel" style="margin-top:18px;min-width:200px">Abbrechen</button>
+  <div class="muted" style="font-size:11px;margin-top:22px;max-width:300px;line-height:1.5">
+    Kein „PIN vergessen?"-Button sichtbar oder ausgesperrt?<br>
+    App-Adresse mit <b>?pinreset=1</b> am Ende öffnen – setzt die PIN zurück, Daten bleiben erhalten.
+  </div>
 </div>
 
 <!-- APP -->
@@ -867,6 +872,10 @@ function parseAmount(raw){
 function fmtShort(ds){ const p=ds.split('-'); return parseInt(p[2],10)+'.'+parseInt(p[1],10)+'.' }
 
 /* ---------- Auth (PIN) ---------- */
+/* Notfall-Zugang: app.html?pinreset=1 setzt die PIN zurück, ohne Daten zu löschen.
+   Die Query macht die URL zugleich cache-frisch, falls ein alter Service Worker
+   noch eine frühere App-Version ausliefert. */
+const PINRESET = /[?&]pinreset\b/.test(location.search);
 async function hash(s){
   const buf=await crypto.subtle.digest('SHA-256', new TextEncoder().encode('cz$'+s));
   return [...new Uint8Array(buf)].map(b=>b.toString(16).padStart(2,'0')).join('');
@@ -922,6 +931,22 @@ function enterApp(){
 }
 // PIN-Änderung abbrechen → zurück in die App (nur erreichbar, wenn eingeloggt)
 document.getElementById('pinCancel').onclick=()=>{ pinMode='login'; pinBuffer=''; renderDots(); enterApp(); };
+/* PIN zurücksetzen → neue PIN festlegen. Daten bleiben vollständig erhalten,
+   es wird ausschließlich der PIN-Hash entfernt. */
+function startPinReset(sub){
+  localStorage.removeItem('cz_pinHash');
+  pinMode='set1'; pinBuffer='';
+  document.getElementById('loginSub').textContent=sub;
+  document.getElementById('pinHint').classList.add('hidden');
+  document.getElementById('pinForgot').classList.add('hidden');
+  document.getElementById('pinCancel').classList.add('hidden');
+  renderDots();
+}
+// PIN vergessen → Reset per Button
+document.getElementById('pinForgot').onclick=()=>{
+  if(!confirm('PIN zurücksetzen?\n\nAlle Daten (Events, Crew, Material, Finanzen, Kunden …) bleiben erhalten. Du legst direkt danach eine neue PIN fest.')) return;
+  startPinReset('Geschäftsführer-Zugang · Neue PIN festlegen');
+};
 function lock(){
   document.getElementById('app').classList.add('hidden');
   document.getElementById('login').classList.remove('hidden');
@@ -929,6 +954,7 @@ function lock(){
   document.getElementById('loginSub').textContent='Geschäftsführer-Zugang · PIN eingeben';
   document.getElementById('pinHint').classList.toggle('hidden', !!DB.get('pinHash',null));
   document.getElementById('pinCancel').classList.add('hidden');
+  document.getElementById('pinForgot').classList.remove('hidden');
   renderDots();
 }
 
@@ -2558,6 +2584,7 @@ document.getElementById('jsonFile').onchange=e=>{
 document.getElementById('changePin').onclick=()=>{ pinMode='set1'; pinBuffer='';
   document.getElementById('app').classList.add('hidden'); document.getElementById('login').classList.remove('hidden');
   document.getElementById('loginSub').textContent='Geschäftsführer-Zugang · Neue PIN'; document.getElementById('pinHint').classList.add('hidden');
+  document.getElementById('pinForgot').classList.add('hidden');
   document.getElementById('pinCancel').classList.remove('hidden'); renderDots(); };
 document.getElementById('logout').onclick=lock;
 
@@ -2571,7 +2598,11 @@ function renderAll(){
 }
 
 /* ---------- PWA / install ---------- */
-if('serviceWorker' in navigator){ window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{})); }
+if('serviceWorker' in navigator && !PINRESET){
+  window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js')
+    .then(reg=>{ reg.update().catch(()=>{}) })   // bei jedem Start auf neue Version prüfen
+    .catch(()=>{}));
+}
 let deferredPrompt=null;
 window.addEventListener('beforeinstallprompt',e=>{
   e.preventDefault(); deferredPrompt=e;
@@ -2592,6 +2623,23 @@ window.addEventListener('beforeinstallprompt',e=>{
 /* ---------- Boot ---------- */
 renderKeys(); renderDots();
 document.getElementById('pinHint').classList.toggle('hidden', !!DB.get('pinHash',null));
+
+/* Notfall-Zugang per URL: ?pinreset=1 — räumt zusätzlich alte Caches und
+   Service-Worker-Registrierungen weg, damit ab jetzt die aktuelle Version läuft. */
+if(PINRESET){
+  startPinReset('PIN zurückgesetzt · Neue PIN festlegen');
+  (async()=>{
+    try{
+      // Erst abmelden, damit der alte Worker den Cache nicht neu befüllt …
+      if(navigator.serviceWorker){ for(const r of await navigator.serviceWorker.getRegistrations()) await r.unregister() }
+      // … dann leeren (zweimal: der abgemeldete Worker kann die laufende Seite noch bedienen).
+      for(let i=0;i<2;i++){
+        if(window.caches){ for(const k of await caches.keys()) await caches.delete(k) }
+        await new Promise(r=>setTimeout(r,150));
+      }
+    }catch{}
+  })();
+}
 </script>
 </body>
 </html>
