@@ -5,7 +5,7 @@
    alles, wodurch installierte Geräte dauerhaft eine alte App-Version bekamen
    und Updates (z. B. der PIN-Reset) nie ankamen. Der Cache dient jetzt nur
    noch als Offline-Reserve. */
-const CACHE = 'createz-portal-v9';
+const CACHE = 'createz-portal-v10';
 const ASSETS = [
   './app.html',
   './manifest.webmanifest',

@@ -729,6 +729,7 @@
     <textarea class="input" id="ckNote" style="min-height:52px" placeholder="Besonderheiten vor Ort …"></textarea>
     <button class="btn ok block" id="ckSave" style="margin-top:16px">Speichern</button>
     <button class="btn ghost block" id="ckReport" style="margin-top:10px">🖨 Report-PDF (Doku für Kunden)</button>
+    <button class="btn ghost block" id="ckExport" style="margin-top:10px">📤 Daten übergeben (JSON)</button>
     <button class="btn ghost block" id="ckClose" style="margin-top:10px">Abbrechen</button>
   </div>
 </div>
@@ -1785,7 +1786,46 @@ document.getElementById('ckReport').onclick=()=>{
   if(ckEditing.check) ckEditing.check.note=document.getElementById('ckNote').value.trim();
   save(); closeSheet('checkSheet'); printEventReport(ckEditing);
 };
+document.getElementById('ckExport').onclick=()=>{
+  if(!ckEditing) return;
+  if(ckEditing.check) ckEditing.check.note=document.getElementById('ckNote').value.trim();
+  save(); exportEventReport(ckEditing);
+};
 document.getElementById('ckClose').onclick=()=>closeSheet('checkSheet');
+/* Übergabe an Fremdsysteme (Kundenportal, Aufbauplaner): maschinenlesbarer
+   Report. Bewusst entkoppelt — eine Datei, kein Zugriff auf fremde Systeme.
+   "format" ist versioniert, damit die Gegenseite sich darauf verlassen kann. */
+function eventReportData(ev){
+  const items=(ev.check?.items||[]).map(it=>({punkt:it.t, erfuellt:!!it.done}));
+  return {
+    format:'createz.event-report', version:1,
+    erstellt: new Date().toISOString(),
+    dienstleister:{
+      name:company.name||'', anschrift:company.addr||'', telefon:company.phone||'',
+      mail:company.mail||'', registergericht:company.reg||'',
+      geschaeftsfuehrer:company.ceo||'', ustIdNr:company.tax||''
+    },
+    event:{
+      id:ev.id||'', titel:ev.title||'', datum:ev.date||'',
+      von:ev.start||'', bis:ev.end||'', typ:ev.type||'',
+      ort:ev.loc||'', kunde:ev.partner||'', notiz:ev.note||''
+    },
+    qualitaetsstandard:{
+      name:ev.check?.tpl||'',
+      erfuellt:items.filter(x=>x.erfuellt).length,
+      gesamt:items.length,
+      bemerkung:ev.check?.note||'',
+      punkte:items
+    }
+  };
+}
+function exportEventReport(ev){
+  const safe=(ev.title||'Event').replace(/[^\wÄÖÜäöüß-]+/g,'_');
+  downloadFile('CREATEZ_Report_'+safe+'_'+(ev.date||'')+'.json',
+    JSON.stringify(eventReportData(ev),null,2),'application/json');
+  toast('Report-Daten exportiert');
+}
+
 function printEventReport(ev){
   const p=checkProgress(ev);
   const rows=(ev.check?.items||[]).map(it=>{
