@@ -44,7 +44,19 @@ eingeschränkten Rollen.
 - PIN vergessen: auf dem Login-Bildschirm „PIN vergessen?" antippen – die PIN
   wird zurückgesetzt und direkt eine neue festgelegt. Alle Daten (Events, Crew,
   Material, Finanzen, Kunden, Rechnungen …) bleiben dabei erhalten.
+- **Notfall-Zugang:** App-Adresse mit `?pinreset=1` aufrufen, z. B.
+  `…/app.html?pinreset=1`. Das setzt die PIN zurück (Daten bleiben erhalten) und
+  räumt zusätzlich alte Caches und Service-Worker-Registrierungen weg. Dieser Weg
+  funktioniert auch dann, wenn ein Gerät noch eine veraltete App-Version anzeigt,
+  weil die Adresse mit Query am Cache vorbeigeht.
 
 Da alle Daten lokal auf dem Gerät liegen, sieht jedes Gerät seinen eigenen
 Datenstand. Für denselben Stand auf mehreren Geräten: Backup über
 „Mehr → Daten → JSON-Export" und auf dem anderen Gerät importieren.
+
+### Updates auf installierten Geräten
+
+`sw.js` liefert HTML **network-first** aus: Beim Start wird immer die aktuelle
+`app.html` vom Server geholt, der Cache dient nur als Offline-Reserve. Zuvor galt
+cache-first für alles — installierte Geräte bekamen dadurch dauerhaft eine alte
+Version und Updates kamen nie an.
